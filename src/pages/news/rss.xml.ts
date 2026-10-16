@@ -5,10 +5,11 @@ const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 
 export const GET: APIRoute = async ({ site }) => {
   const news = await getNews();
-  const base = site ?? new URL('https://www.shotsolver.dev');
+  // Include the base path (set while the site is served from a GitHub Pages project path).
+  const base = new URL(import.meta.env.BASE_URL.replace(/\/?$/, '/'), site ?? 'https://www.shotsolver.dev');
   const items = news
     .map((n) => {
-      const url = new URL(newsUrl(n), base).href;
+      const url = new URL(newsUrl(n).slice(1), base).href;
       return `    <item>
       <title>${esc(n.data.title)}</title>
       <link>${url}</link>
@@ -23,7 +24,7 @@ export const GET: APIRoute = async ({ site }) => {
 <rss version="2.0">
   <channel>
     <title>SHOT news</title>
-    <link>${new URL('/news/', base).href}</link>
+    <link>${new URL('news/', base).href}</link>
     <description>News and releases of SHOT, the Supporting Hyperplane Optimization Toolkit</description>
     <language>en</language>
 ${items}

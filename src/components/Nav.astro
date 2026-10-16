@@ -9,7 +9,9 @@ const links = [
   { href: '/publications/', label: 'Publications' },
   { href: '/team/', label: 'Team' },
 ];
-const path = Astro.url.pathname;
+// The path without the base, so it compares with the root-relative links above.
+const root = import.meta.env.BASE_URL.replace(/\/$/, '');
+const path = Astro.url.pathname.slice(root.length) || '/';
 const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href));
 ---
 

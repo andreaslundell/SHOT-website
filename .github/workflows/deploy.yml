@@ -27,9 +27,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Gives the Pages URL: /SHOT-website as base path on github.io, empty once a custom domain is set.
+      - id: pages
+        uses: actions/configure-pages@v5
       - run: npm run build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          SITE_URL: ${{ steps.pages.outputs.origin }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
