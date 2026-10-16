@@ -1,0 +1,49 @@
+---
+import Icon from './Icon.astro';
+import type { Person } from '../data/team';
+
+interface Props {
+  person: Person;
+}
+const { person: p } = Astro.props;
+const initials = p.name.split(' ').map((s) => s[0]).join('');
+const photo = p.photo ?? (p.github && p.githubAvatar !== false ? `https://github.com/${p.github}.png?size=144` : undefined);
+const links = [
+  p.scholar && { href: p.scholar, icon: 'scholar', label: 'Google Scholar' },
+  p.researchgate && { href: p.researchgate, icon: 'researchgate', label: 'ResearchGate' },
+  p.linkedin && { href: p.linkedin, icon: 'linkedin', label: 'LinkedIn' },
+  p.github && { href: `https://github.com/${p.github}`, icon: 'github', label: 'GitHub' },
+].filter(Boolean) as { href: string; icon: string; label: string }[];
+---
+
+<article class="person">
+  <div class="person__mark" aria-hidden="true">
+    {photo ? <img src={photo} alt="" width="72" height="72" loading="lazy" style={p.photoFit === 'contain' ? 'object-fit: contain' : undefined} /> : initials}
+  </div>
+  <div class="person__body">
+    <h3 class="heading person__name">{p.url ? <a href={p.url}>{p.name}</a> : p.name}</h3>
+    {p.position && <p class="body">{p.position}</p>}
+    <p class="small muted">
+      {
+        p.affiliations.map((a, i) => (
+          <>
+            {i > 0 && ' and '}
+            {a.url ? <a class="link" href={a.url}>{a.name}</a> : a.name}
+          </>
+        ))
+      }
+    </p>
+    {p.role && <p class="small body-text">{p.role}</p>}
+    {
+      links.length > 0 && (
+        <ul class="person__links">
+          {links.map((l) => (
+            <li>
+              <a href={l.href} aria-label={`${p.name} on ${l.label}`} title={l.label}><Icon name={l.icon} /></a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</article>

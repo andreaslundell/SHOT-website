@@ -2,11 +2,12 @@
 import Base from '../layouts/Base.astro';
 import Heading from '../components/Heading.astro';
 import Icon from '../components/Icon.astro';
-import { developers, contributors, openSource, commercial, supporters, funders, type Person } from '../data/team';
+import PersonCard from '../components/PersonCard.astro';
+import { developers, contributors, openSource, supporters, funders, abo } from '../data/team';
+import { theses } from '../data/publications';
 import { getContributors, repoUrl } from '../data/github';
 
 const gh = await getContributors();
-const initials = (p: Person) => p.name.split(' ').map((s) => s[0]).join('');
 ---
 
 <Base title="Team and contributors" description="The developers and contributors of SHOT, the open-source projects it builds on, and the organizations that have supported it.">
@@ -15,7 +16,8 @@ const initials = (p: Person) => p.name.split(' ').map((s) => s[0]).join('');
       <Heading eyebrow="Community" level={1} size="display">
         Team and contributors
         <Fragment slot="lead">
-          SHOT is developed at Åbo Akademi University with collaborators, and is part of <a class="link" href="https://www.coin-or.org">COIN-OR</a>.
+          SHOT is developed at <a class="link" href={abo.url}>Åbo Akademi University</a> with collaborators, and is part of
+          <a class="link" href="https://www.coin-or.org">COIN-OR</a>.
         </Fragment>
       </Heading>
     </div>
@@ -23,38 +25,39 @@ const initials = (p: Person) => p.name.split(' ').map((s) => s[0]).join('');
     <section class="section" style="padding-top: var(--space-7)" aria-labelledby="dev-title">
       <h2 class="label shot-eyebrow" id="dev-title" style="margin-bottom: var(--space-5)">Main developers</h2>
       <div class="people people--lead">
-        {
-          developers.map((p) => (
-            <article class="person">
-              <div class="person__mark" aria-hidden="true">
-                {p.github ? <img src={`https://github.com/${p.github}.png?size=144`} alt="" width="72" height="72" loading="lazy" /> : initials(p)}
-              </div>
-              <div class="person__body">
-                <h3 class="heading person__name">{p.url ? <a href={p.url}>{p.name}</a> : p.name}</h3>
-                <p class="body">{p.role}</p>
-                <p class="small muted">{p.affiliation}</p>
-              </div>
-            </article>
-          ))
-        }
+        {developers.map((p) => <PersonCard person={p} />)}
       </div>
       <h2 class="label shot-eyebrow" style="margin: var(--space-7) 0 var(--space-5)">Contributors</h2>
       <div class="people">
+        {contributors.map((p) => <PersonCard person={p} />)}
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="theses-title">
+      <div class="section-head" style="margin-bottom: var(--space-5)">
+        <Heading eyebrow="Theses" id="theses-title">
+          Student theses
+          <Fragment slot="lead">Master’s theses at Åbo Akademi University that have contributed to SHOT.</Fragment>
+        </Heading>
+        <a class="more-link" href="/publications/#theses"><span>In publications</span><Icon name="arrow-right" /></a>
+      </div>
+      <ol class="pubs">
         {
-          contributors.map((p) => (
-            <article class="person">
-              <div class="person__mark" aria-hidden="true">
-                {p.github ? <img src={`https://github.com/${p.github}.png?size=144`} alt="" width="72" height="72" loading="lazy" /> : initials(p)}
+          theses.map((t) => (
+            <li class="pub">
+              <span class="pub__year">{t.year}</span>
+              <div class="pub__body">
+                <p class="pub__title"><a href={t.url}>{t.title}</a></p>
+                <p class="small pub__authors">{t.author}</p>
+                <p class="small pub__venue">{t.contribution}</p>
               </div>
-              <div class="person__body">
-                <h3 class="heading person__name">{p.url ? <a href={p.url}>{p.name}</a> : p.name}</h3>
-                <p class="body">{p.role}</p>
-                <p class="small muted">{p.affiliation}</p>
+              <div class="pub__actions">
+                <a class="shot-btn shot-btn--ghost shot-btn--sm" href={t.url} aria-label={`Read: ${t.title}`}>Read <Icon name="external" /></a>
               </div>
-            </article>
+            </li>
           ))
         }
-      </div>
+      </ol>
     </section>
 
     <section class="section" aria-labelledby="gh-title">
@@ -113,16 +116,9 @@ const initials = (p: Person) => p.name.split(' ').map((s) => s[0]).join('');
       <div class="shot-note" style="margin-top: var(--space-7)">
         <p class="label shot-eyebrow">Commercial software</p>
         <p class="body body-text measure">
-          SHOT can also use
-          {
-            commercial.map((l, i) => (
-              <>
-                <a class="link" href={l.url}>{l.name}</a>
-                {i < commercial.length - 2 ? ', ' : i === commercial.length - 2 ? ' and ' : ''}
-              </>
-            ))
-          }
-          {' '}when they are installed and licensed.
+          SHOT can also use <a class="link" href="https://www.ibm.com/products/ilog-cplex-optimization-studio">IBM CPLEX</a> and
+          <a class="link" href="https://www.gurobi.com">Gurobi</a> as MIP solvers, and <a class="link" href="https://www.gams.com">GAMS</a>
+          as a modeling system, when they are installed and licensed. Through GAMS, SHOT can use any GAMS NLP solver that is installed and licensed.
         </p>
       </div>
     </section>

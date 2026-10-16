@@ -250,9 +250,12 @@ button.shot-btn { font-family: var(--font-sans); }
 .person { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: var(--space-5); align-items: start; padding-top: var(--space-5); border-top: var(--stroke-strong) solid var(--ink); }
 .people--lead .person { border-top-color: var(--shot-red); }
 .person__mark { width: 72px; height: 72px; display: grid; place-items: center; background: var(--surface-raised); font-family: var(--font-display); font-size: 24px; font-weight: 500; color: var(--ink); border-radius: var(--radius-full); overflow: hidden; }
-.person__mark img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.person__mark img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; display: block; }
 .person__body > * { margin: 0; }
 .person__body > * + * { margin-top: var(--space-1); }
+.person__links { display: flex; gap: var(--space-3); list-style: none; margin: var(--space-2) 0 0 !important; padding: 0; }
+.person__links a { color: var(--ink-muted); font-size: 18px; display: inline-flex; padding: 2px; transition: color .15s; }
+.person__links a:hover { color: var(--shot-red); }
 .person__name a { color: var(--ink); text-decoration: none; }
 .person__name a:hover { text-decoration: underline; text-decoration-color: var(--shot-red); text-underline-offset: 4px; }
 @media (max-width: 720px) { .people { grid-template-columns: 1fr; } }
@@ -300,3 +303,12 @@ button.shot-btn { font-family: var(--font-sans); }
 code, pre, kbd, .code, .shot-cmd, .esh__log { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
 
 .shot-heading, .newsitem__summary, .pub__body { overflow-wrap: break-word; }
+.shot-inline-code { white-space: nowrap; }
+
+.bibblock { margin-top: var(--space-6); display: flex; flex-direction: column; gap: var(--space-3); }
+.pubnav { align-items: center; margin: var(--space-8) 0 0; padding-top: var(--space-5); border-top: var(--stroke-hairline) solid var(--rule); }
+.pubnav .label { text-transform: uppercase; margin-right: var(--space-3); }
+
+/* Animated contour background (src/scripts/background.ts), behind all content */
+#bg-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+main, .footer { position: relative; z-index: 1; }

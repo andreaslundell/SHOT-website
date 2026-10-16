@@ -1,42 +1,101 @@
 // People behind SHOT. GitHub contributors are also fetched at build time (see src/data/github.ts).
 
+export interface Affiliation {
+  name: string;
+  url?: string;
+}
+
 export interface Person {
   name: string;
-  role: string;
-  affiliation: string;
-  url?: string;
+  position?: string;
+  affiliations: Affiliation[];
+  role?: string; // contribution to SHOT
+  url?: string; // research or home page
+  photo?: string; // falls back to the GitHub avatar
+  githubAvatar?: boolean; // false when the GitHub avatar is not a photo
+  photoFit?: 'cover' | 'contain'; // contain shows the whole photo inside the circle
   github?: string;
+  scholar?: string;
+  researchgate?: string;
+  linkedin?: string;
 }
+
+export const abo: Affiliation = { name: 'Åbo Akademi University', url: 'https://www.abo.fi' };
+
+const kth: Affiliation = { name: 'KTH Royal Institute of Technology', url: 'https://www.kth.se' };
 
 export const developers: Person[] = [
   {
     name: 'Andreas Lundell',
+    position: 'Associate Professor in Information Technology',
+    affiliations: [abo],
     role: 'Project manager and main developer',
-    affiliation: 'Åbo Akademi University, Finland',
-    url: 'https://www.researchgate.net/profile/Andreas_Lundell',
+    url: 'https://research.abo.fi/en/persons/andreas-lundell/',
+    photo: '/images/team/lundell.jpg',
     github: 'andreaslundell',
+    scholar: 'https://scholar.google.com/citations?user=UB3JBrkAAAAJ',
+    researchgate: 'https://www.researchgate.net/profile/Andreas_Lundell',
+    linkedin: 'https://www.linkedin.com/in/andreaslundell',
   },
   {
     name: 'Jan Kronqvist',
-    role: 'Main developer, co-author of the ESH algorithm',
-    affiliation: 'KTH Royal Institute of Technology, Sweden',
-    url: 'https://www.researchgate.net/profile/Jan_Kronqvist',
+    position: 'Associate Professor in Optimization and Systems Theory',
+    affiliations: [kth],
+    role: 'Algorithm development',
+    url: 'https://www.kth.se/profile/jankr',
+    photo: '/images/team/kronqvist.jpg',
+    scholar: 'https://scholar.google.com/citations?user=hEdm6bAAAAAJ',
+    researchgate: 'https://www.researchgate.net/profile/Jan-Kronqvist',
+    linkedin: 'https://se.linkedin.com/in/jan-kronqvist',
   },
 ];
 
 export const contributors: Person[] = [
   {
+    name: 'Joakim Blomqvist',
+    position: 'PhD student',
+    affiliations: [abo],
+    role: 'Algorithm development',
+    url: 'https://research.abo.fi/en/persons/joakim-blomqvist/',
+    photo: '/images/team/blomqvist.jpg',
+    github: 'JoaBlo',
+  },
+  {
+    name: 'Alireza Olama',
+    affiliations: [abo, { name: 'QuTwo', url: 'https://www.qutwo.com/' }],
+    role: 'Parallel heuristics',
+    url: 'https://alirezalm.github.io/',
+    photo: '/images/team/olama.jpg',
+    github: 'Alirezalm',
+    scholar: 'https://scholar.google.com/citations?user=km4oc50AAAAJ',
+    linkedin: 'https://www.linkedin.com/in/alireza-olama-213a6a107/',
+  },
+  {
     name: 'Stefan Vigerske',
+    affiliations: [{ name: 'GAMS Software GmbH', url: 'https://www.gams.com' }],
     role: 'GAMS integration',
-    affiliation: 'GAMS Software GmbH',
-    url: 'https://www.gams.com/~stefan/',
+    url: 'https://www.gams.com/~svigerske/',
     github: 'svigerske',
   },
   {
+    name: 'Oscar Dowson',
+    position: 'JuMP core contributor',
+    affiliations: [{ name: 'JuMP', url: 'https://jump.dev' }],
+    role: 'Julia integration and the build system for SHOT',
+    github: 'odow',
+    scholar: 'https://scholar.google.com/citations?user=COLMCQcAAAAJ',
+    linkedin: 'https://www.linkedin.com/in/oscar-dowson-544704272/',
+  },
+  {
     name: 'Tapio Westerlund',
+    position: 'Professor emeritus',
+    affiliations: [abo],
     role: 'Originator of the ECP and ESH methods',
-    affiliation: 'Åbo Akademi University, Finland',
-    url: 'https://www.researchgate.net/profile/Tapio_Westerlund',
+    url: 'https://users.abo.fi/twesterl/',
+    photo: '/images/team/westerlund.jpg',
+    photoFit: 'contain',
+    scholar: 'https://scholar.google.com/citations?user=4sK1tUQAAAAJ',
+    researchgate: 'https://www.researchgate.net/profile/Tapio-Westerlund',
   },
 ];
 
@@ -53,7 +112,7 @@ export const openSource: { group: string; items: Link[] }[] = [
       { name: 'Cbc', url: 'https://github.com/coin-or/Cbc', note: 'MIP' },
       { name: 'HiGHS', url: 'https://highs.dev', note: 'MIP' },
       { name: 'Ipopt', url: 'https://github.com/coin-or/Ipopt', note: 'NLP' },
-      { name: 'Uno', url: 'https://github.com/cvanaret/Uno', note: 'NLP, optional' },
+      { name: 'Uno', url: 'https://github.com/cvanaret/Uno', note: 'NLP' },
     ],
   },
   {
@@ -83,12 +142,6 @@ export const openSource: { group: string; items: Link[] }[] = [
       { name: 'JSON for Modern C++', url: 'https://github.com/nlohmann/json' },
     ],
   },
-];
-
-export const commercial: Link[] = [
-  { name: 'IBM CPLEX', url: 'https://www.ibm.com/products/ilog-cplex-optimization-studio', note: 'MIP' },
-  { name: 'Gurobi', url: 'https://www.gurobi.com', note: 'MIP' },
-  { name: 'GAMS', url: 'https://www.gams.com', note: 'Modeling system and NLP solvers' },
 ];
 
 export const supporters = 'We greatly appreciate the support from COIN-OR, GAMS and HiGHS during the development of SHOT.';

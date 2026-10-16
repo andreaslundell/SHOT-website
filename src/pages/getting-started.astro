@@ -8,11 +8,15 @@ import { repoUrl } from '../data/github';
 
 const docs = `${repoUrl}/blob/master/docs`;
 
+// Plain text with `backticks` for inline code.
+const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const inline = (t: string) => esc(t).replace(/`([^`]+)`/g, '<code class="shot-inline-code">$1</code>');
+
 const install = [
   {
     id: 'pip',
     label: 'Python',
-    text: 'The SHOTpy wheels include SHOT with the open-source subsolvers Cbc, Ipopt and HiGHS, and need Python 3.11 or later. They are built for Linux (x86-64) and macOS (Apple silicon, macOS 14 and later); elsewhere, pip compiles SHOT from source.',
+    text: 'The SHOTpy wheels include SHOT with the open-source subsolvers Cbc, Ipopt and HiGHS, and need Python 3.11 or later. They are built for Linux (x86-64) and macOS (Apple silicon, macOS 14 and later). On other Linux and macOS systems, pip builds SHOT from source, which needs the compiler and dependencies in the compilation instructions. Windows is not supported; use the Windows Subsystem for Linux.',
     code: 'pip install SHOTpy',
     lang: 'bash',
     file: 'terminal',
@@ -20,13 +24,14 @@ const install = [
     code2: `pip install SHOTpy --no-binary SHOTpy \\
     --config-settings=cmake.define.HAS_GUROBI=on \\
     --config-settings=cmake.define.GUROBI_DIR=/opt/gurobi1103/linux64`,
-    note: 'Use the same pattern with HAS_CPLEX and CPLEX_DIR, or HAS_GAMS and GAMS_DIR.',
+    note: 'Use the same pattern with `HAS_CPLEX` and `CPLEX_DIR`, or `HAS_GAMS` and `GAMS_DIR`.',
   },
   {
     id: 'gams',
     label: 'GAMS and GAMSPy',
-    text: 'SHOT is included in GAMS and in GAMSPy, its Python modeling library. If you have either, you already have SHOT, and inside GAMS it can use any licensed NLP solver as subsolver. This is the easiest way to use SHOT.',
-    code: 'pip install gamspy',
+    text: 'SHOT is included in GAMS, and inside GAMS it can use any licensed NLP solver as subsolver. In GAMSPy, the Python modeling library of GAMS, SHOT is an add-on solver that you install separately. This is the easiest way to use SHOT.',
+    code: `pip install gamspy
+gamspy install solver shot`,
     lang: 'bash',
     file: 'terminal',
     links: [
@@ -43,18 +48,19 @@ const install = [
   {
     id: 'source',
     label: 'From source',
-    text: 'SHOT compiles on Linux and macOS with CMake and a C++17 compiler; on Windows, use the Windows Subsystem for Linux. It needs at least one MIP solver (Cbc, CPLEX, Gurobi or HiGHS) and an NLP solver (Ipopt or GAMS). HiGHS is compiled from its submodule by default.',
+    text: 'SHOT compiles on Linux and macOS with CMake and a C++17 compiler; on Windows, use the Windows Subsystem for Linux. It needs a MIP solver and an NLP solver; the open-source Cbc, HiGHS and Ipopt are enough. HiGHS is compiled from its submodule by default.',
     code: `git clone https://github.com/coin-or/SHOT.git
 cd SHOT
 git submodule update --init --recursive
 
-# An open-source build with Cbc, Ipopt and HiGHS
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \\
-  -DHAS_GAMS=off -DHAS_CPLEX=off -DHAS_GUROBI=off
+  -DCBC_DIR=/path/to/cbc \\
+  -DIPOPT_DIR=/path/to/ipopt
 cmake --build build --parallel`,
     lang: 'bash',
     file: 'terminal',
-    after: 'This builds the SHOT executable and the libSHOTSolver library in build/. Add -DHAS_PYTHON=on to also build SHOTpy. Check the CMake output for lines saying that a solver was not found; such a solver is then left out of the build.',
+    after: '`CBC_DIR` and `IPOPT_DIR` give the locations of Cbc and Ipopt, if CMake does not find them itself. To use an installed HiGHS instead of the submodule, add `-DUSE_EXTERNAL_HIGHS=on` and `-DHIGHS_EXTERNAL_DIR=/path/to/highs`. This builds the `SHOT` executable and the `libSHOTSolver` library in `build/`; add `-DHAS_PYTHON=on` to also build SHOTpy. Check the CMake output for lines saying that a solver was not found; such a solver is left out of the build.',
+    note: 'SHOT reads AMPL (`.nl`) and OSiL (`.osil`) files out of the box. Reading GAMS (`.gms`) files requires SHOT to be compiled with a GAMS installation.',
     links: [{ href: `${docs}/CompilationInstructions.md`, label: 'Full compilation instructions' }],
   },
 ];
@@ -81,7 +87,7 @@ solver.setProblem(problem)
 solver.solveProblem()
 
 print(solver.getModelReturnStatus(), solver.getPrimalSolution().point)`,
-    text: 'Build the problem with the API, or read it from a file with solver.setProblem("problem.nl"), which also accepts .gms and .osil files. The tutorial notebook covers nonlinear expressions, settings and callbacks.',
+    text: 'Build the problem with the API, or read it from a file with `solver.setProblem("problem.nl")`, which also accepts `.gms` and `.osil` files. The tutorial notebook covers nonlinear expressions, settings and callbacks.',
     link: { href: `${docs}/SHOTpy_Tutorial.ipynb`, label: 'SHOTpy tutorial' },
   },
   {
@@ -105,7 +111,7 @@ model = gp.Model(m, name="model", equations=[con], problem="MINLP",
                  sense=gp.Sense.MIN, objective=2 * x + y)
 model.solve(solver="SHOT")
 print(model.objective_value)`,
-    text: 'Pass solver="SHOT" to solve() for MINLP and MIQCP models.',
+    text: 'Install SHOT in GAMSPy with `gamspy install solver shot`, then pass `solver="SHOT"` to `solve()` for MINLP and MIQCP models.',
     link: { href: 'https://gamspy.readthedocs.io', label: 'GAMSPy documentation' },
   },
   {
@@ -117,8 +123,8 @@ print(model.objective_value)`,
 option minlp = shot;
 
 solve mymodel using minlp minimizing obj;`,
-    text: 'You can also set it on the command line, e.g., gams model.gms minlp=shot. To use your own build of SHOT in GAMS, add it as a solver in gamsconfig.yaml.',
-    link: { href: 'https://www.gams.com/latest/docs/UG_GamsCall.html#UG_GamsCall_GAMSConfigYAML', label: 'GAMS configuration' },
+    text: 'You can also set it on the command line, e.g., `gams model.gms minlp=shot`.',
+    link: { href: 'https://www.gams.com/latest/docs/S_SHOT.html', label: 'SHOT in the GAMS documentation' },
   },
   {
     id: 'pyomo',
@@ -133,7 +139,7 @@ model = pyo.ConcreteModel()
 # SHOT is called through the AMPL Solver Library (ASL) interface
 solver = pyo.SolverFactory("asl:SHOT")  # or add executable="/path/to/SHOT"
 solver.solve(model, tee=True)`,
-    text: 'The SHOT executable must be on your path, or given with executable. With GAMS installed, you can also use SHOT through the Pyomo GAMS interface.',
+    text: 'The SHOT executable must be on your path, or given with `executable`. With GAMS installed, you can also use SHOT through the Pyomo GAMS interface.',
     link: { href: 'https://www.pyomo.org', label: 'Pyomo' },
   },
   {
@@ -146,7 +152,7 @@ solver.solve(model, tee=True)`,
 model = Model(() -> AmplNLWriter.Optimizer("SHOT"))  # or the full path to SHOT
 # ... variables, constraints and objective ...
 optimize!(model)`,
-    text: 'JuMP calls SHOT through AmplNLWriter.jl, which writes the model in AMPL .nl format. A native JuMP interface is on the roadmap after SHOT 2.0.',
+    text: 'JuMP calls SHOT through AmplNLWriter.jl, which writes the model in AMPL `.nl` format. A native JuMP interface is on the roadmap after SHOT 2.0.',
     link: { href: 'https://github.com/jump-dev/AmplNLWriter.jl', label: 'AmplNLWriter.jl' },
   },
   {
@@ -156,7 +162,7 @@ optimize!(model)`,
     lang: 'bash',
     code: `# SHOT reads the .nl file and writes problem.sol next to it
 ./SHOT problem.nl --AMPL`,
-    text: 'SHOT works with any modeling system that uses the AMPL Solver Library: models in .nl format and solutions in .sol format. In AMPL, set SHOT as the solver with option solver.',
+    text: 'SHOT works with any modeling system that uses the AMPL Solver Library: models in `.nl` format and solutions in `.sol` format. In AMPL, set SHOT as the solver with `option solver`.',
     link: { href: 'https://ampl.com', label: 'AMPL' },
   },
   {
@@ -168,7 +174,7 @@ optimize!(model)`,
 ./SHOT problem.nl --timelimit=60    # AMPL
 ./SHOT problem.gms --mip=highs      # GAMS
 ./SHOT --help                       # what this build supports`,
-    text: 'SHOT prints the dual and primal bounds as it iterates, and writes the solution in OSrL format and a log to SHOT.log.',
+    text: 'SHOT prints the dual and primal bounds as it iterates, and writes the solution in OSrL format and a log to `SHOT.log`.',
     link: { href: `${docs}/CommandLineUsage.md`, label: 'Command-line reference' },
   },
   {
@@ -186,7 +192,7 @@ if(solver->setProblem("problem.osil") && solver->solveProblem())
     double primal = solver->getPrimalBound();
     double dual = solver->getCurrentDualBound();
 }`,
-    text: 'Link against libSHOTSolver to embed SHOT in other software; the console application is a thin wrapper around this API. Callbacks are registered with registerCallback.',
+    text: 'Link against `libSHOTSolver` to embed SHOT in other software; the console application is a thin wrapper around this API. Callbacks are registered with `registerCallback`.',
     link: { href: `${docs}/Callbacks.md`, label: 'Callbacks' },
   },
 ];
@@ -230,11 +236,11 @@ const flags: [string, string][] = [
           {
             install.map((t, i) => (
               <div class="tabs__panel" role="tabpanel" id={`panel-${t.id}`} aria-labelledby={`tab-${t.id}`} hidden={i !== 0} tabindex="0">
-                <p>{t.text}</p>
+                <p set:html={inline(t.text)} />
                 {t.code && (t.code.includes('\n') ? <CodeBlock code={t.code} lang={t.lang} file={t.file} /> : <p><Command cmd={t.code} /></p>)}
-                {t.after && <p>{t.after}</p>}
+                {t.after && <p set:html={inline(t.after)} />}
                 {t.code2 && <CodeBlock code={t.code2} lang="bash" file="terminal" />}
-                {t.note && <p class="small muted">{t.note}</p>}
+                {t.note && <p class="small muted" set:html={inline(t.note)} />}
                 {t.links && (
                   <p class="hero__actions" style="margin-top: var(--space-4)">
                     {t.links.map((l) => (
@@ -276,7 +282,7 @@ const flags: [string, string][] = [
             usage.map((t, i) => (
               <div class="tabs__panel" role="tabpanel" id={`panel-${t.id}`} aria-labelledby={`tab-${t.id}`} hidden={i !== 0} tabindex="0">
                 <CodeBlock code={t.code} lang={t.lang} file={t.file} />
-                <p>{t.text}</p>
+                <p set:html={inline(t.text)} />
                 <p><a class="more-link" href={t.link.href}><span>{t.link.label}</span><Icon name="arrow-right" /></a></p>
               </div>
             ))
@@ -291,7 +297,7 @@ const flags: [string, string][] = [
         <h2 class="title" id="options-title">Set options</h2>
         <p class="body body-text measure">
           Any setting can be given on the command line as <code class="shot-inline-code">Name=value</code>, without spaces around
-          the <code class="shot-inline-code">=</code>. Names are case sensitive, and unknown names are ignored without an error.
+          the <code class="shot-inline-code">=</code>. Names are case sensitive. Unknown names are ignored, and SHOT lists them in a warning.
         </p>
         <CodeBlock code="./SHOT problem.nl Termination.TimeLimit=100.0 Termination.ObjectiveGap.Relative=0.001" lang="bash" file="terminal" />
         <p class="body body-text measure">

@@ -14,4 +14,4 @@ At the SIAM Conference on Optimization (OP26) in Edinburgh, Andreas Lundell pres
 - the decomposition of nonseparable convex quadratic expressions, the convex bounding strategy for nonconvex problems and parallel primal heuristics,
 - the roadmap after version 2.0: a JuMP interface, SCIP as a MIP subsolver, presolve and more reformulations of nonconvex terms.
 
-Read more in the [SHOT 2.0 release candidate](/news/2026-10-shot-2-0-release-candidate/) announcement.
+Read more in the [SHOT 2.0 release](/news/2026-10-shot-2-0/) announcement.

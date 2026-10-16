@@ -39,7 +39,7 @@ const capability: [string, Mark[]][] = [
           )
         }
         <p class="label shot-eyebrow">Open-source MINLP solver</p>
-        <h1 class="display" id="hero-title">Convex MINLP, solved to <span class="shot-hl">global optimality</span></h1>
+        <h1 class="display" id="hero-title">(Convex) MINLP, solved to <span class="shot-hl">optimality</span></h1>
         <p class="lead hero__lead">
           SHOT combines polyhedral outer approximation with primal heuristics. Use it from GAMSPy, Pyomo, JuMP, AMPL, C++ or Python.
         </p>
@@ -81,7 +81,7 @@ const capability: [string, Mark[]][] = [
         <div class="shot-rows__row"><p class="label">Method</p><p class="body">Polyhedral outer approximation (ESH and ECP) combined with primal heuristics</p></div>
         <div class="shot-rows__row"><p class="label">Subsolvers</p><p class="body">MIP: CPLEX, Gurobi, Cbc or HiGHS. NLP: Ipopt, Uno, or any NLP solver in GAMS</p></div>
         <div class="shot-rows__row"><p class="label">Interfaces</p><p class="body">GAMSPy, GAMS, Python (SHOTpy), C++, the command line, and AMPL, Pyomo and JuMP through ASL</p></div>
-        <div class="shot-rows__row"><p class="label">Formats</p><p class="body">OSiL, AMPL <code class="shot-inline-code">.nl</code> and GAMS <code class="shot-inline-code">.gms</code></p></div>
+        <div class="shot-rows__row"><p class="label">Problem formats</p><p class="body">OSiL, AMPL <code class="shot-inline-code">.nl</code> and GAMS <code class="shot-inline-code">.gms</code></p></div>
         <div class="shot-rows__row"><p class="label">Community</p><p class="body">A <a class="link" href="https://www.coin-or.org">COIN-OR</a> project, winner of the COIN-OR Cup 2018, licensed under EPL-2.0</p></div>
       </div>
     </div>
@@ -106,7 +106,7 @@ const capability: [string, Mark[]][] = [
           <ul class="shot-list body">
             <li>Supporting hyperplanes (ESH) or cutting planes (ECP) build an outer approximation of the nonlinear feasible set.</li>
             <li>The MIP subsolver (CPLEX, Gurobi, Cbc or HiGHS) gives the dual bound, the minimum within the approximation.</li>
-            <li>Single-tree (branch and cut) or multi-tree, and with quadratic MIQP and MIQCQP subproblems where the subsolver supports them.</li>
+            <li>Multi-tree with every MIP subsolver. With CPLEX and Gurobi, also single-tree (branch and cut), and quadratic terms can be passed directly to MIQP and MIQCQP subproblems.</li>
           </ul>
         </article>
         <article class="shot-card shot-card--ink">
@@ -173,7 +173,7 @@ const capability: [string, Mark[]][] = [
     <div class="wrap band__inner">
       <div class="band__copy">
         <header class="shot-heading">
-          <p class="label shot-eyebrow">Release candidate</p>
+          <p class="label shot-eyebrow">New version</p>
           <h2 class="title" id="v2-title">What's new in <span class="shot-hl">SHOT 2.0</span></h2>
           <p class="lead">A Python interface, HiGHS as MIP subsolver, and callbacks that let you take part in the solution process.</p>
         </header>

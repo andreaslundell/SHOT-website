@@ -54,6 +54,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     </script>
   </head>
   <body>
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
     <a class="skip" href="#main">Skip to content</a>
     <Nav />
     <main id="main">
@@ -62,6 +63,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <Footer />
     <script>
       import '../scripts/site.ts';
+      import { mountBackground } from '../scripts/background.ts';
+      const bg = document.getElementById('bg-canvas');
+      if (bg instanceof HTMLCanvasElement) mountBackground(bg);
     </script>
   </body>
 </html>
