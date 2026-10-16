@@ -1,0 +1,233 @@
+---
+import Base from '../layouts/Base.astro';
+import Heading from '../components/Heading.astro';
+import Icon from '../components/Icon.astro';
+import Command from '../components/Command.astro';
+import EshDemo from '../components/EshDemo.astro';
+import Reference from '../components/Reference.astro';
+import { getNews, formatDate, newsUrl, newsTypes } from '../data/news';
+import { mainPaper, nonconvexPaper } from '../data/publications';
+import { repoUrl } from '../data/github';
+
+const news = await getNews();
+const latest = news.slice(0, 3);
+const latestRelease = news.find((n) => n.data.type === 'release');
+
+// Capability by MIP subsolver: 'direct' = handled directly by the subsolver, 'yes' = global, 'unknown' = no guarantee.
+type Mark = 'yes' | 'direct' | 'unknown';
+const solvers = ['CPLEX', 'Gurobi', 'Cbc', 'HiGHS'];
+const capability: [string, Mark[]][] = [
+  ['Convex MIQP', ['direct', 'direct', 'yes', 'yes']],
+  ['Convex MIQCQP', ['direct', 'direct', 'yes', 'yes']],
+  ['Convex MINLP', ['yes', 'yes', 'yes', 'yes']],
+  ['Nonconvex MIQP', ['direct', 'direct', 'unknown', 'unknown']],
+  ['Nonconvex MIQCQP', ['unknown', 'direct', 'unknown', 'unknown']],
+  ['Nonconvex MINLP', ['unknown', 'unknown', 'unknown', 'unknown']],
+];
+---
+
+<Base>
+  <div class="wrap">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__copy">
+        {
+          latestRelease && (
+            <a class="hero__notice small" href={newsUrl(latestRelease)}>
+              <span class="label">New</span>
+              <span>{latestRelease.data.title}</span>
+            </a>
+          )
+        }
+        <p class="label shot-eyebrow">Open-source MINLP solver</p>
+        <h1 class="display" id="hero-title">Convex MINLP, solved to <span class="shot-hl">global optimality</span></h1>
+        <p class="lead hero__lead">
+          SHOT combines polyhedral outer approximation with primal heuristics. Use it from GAMSPy, Pyomo, JuMP, AMPL, C++ or Python.
+        </p>
+        <div class="hero__actions">
+          <a class="shot-btn shot-btn--accent" href="/getting-started/">Get started</a>
+          <a class="shot-btn shot-btn--ghost" href={repoUrl}><Icon name="github" /> View on GitHub</a>
+        </div>
+        <p><Command cmd="pip install SHOTpy" /></p>
+      </div>
+      <div class="hero__art">
+        <img
+          class="only-light"
+          src="/images/motifs/paraboloid-light.svg"
+          alt="A convex paraboloid drawn as a wireframe, with a supporting hyperplane touching it at one point, above a lattice of integer points."
+          width="940"
+          height="900"
+        />
+        <img class="only-dark" src="/images/motifs/paraboloid-dark.svg" alt="" width="940" height="900" />
+      </div>
+    </section>
+  </div>
+
+  <section class="section" id="overview" aria-labelledby="overview-title">
+    <div class="wrap split">
+      <div class="stack">
+        <Heading eyebrow="01 — Overview" id="overview-title">What is SHOT?</Heading>
+        <p class="body body-text measure" style="margin-top: var(--space-5)">
+          SHOT, the Supporting Hyperplane Optimization Toolkit, is an open-source solver for mixed-integer nonlinear programming (MINLP),
+          written in C++. It is global for convex MINLP, and mainly a heuristic for nonconvex MINLP, where the bounds on the objective value
+          are still guaranteed.
+        </p>
+        <p class="body body-text measure">
+          A reformulation engine rewrites each problem into a form that suits the method, and some nonconvex problem types are
+          reformulated into convex ones and solved to global optimality.
+        </p>
+      </div>
+      <div class="shot-rows">
+        <div class="shot-rows__row"><p class="label">Problems</p><p class="body">MINLP and its subclasses: NLP, MIQP and MIQCQP</p></div>
+        <div class="shot-rows__row"><p class="label">Method</p><p class="body">Polyhedral outer approximation (ESH and ECP) combined with primal heuristics</p></div>
+        <div class="shot-rows__row"><p class="label">Subsolvers</p><p class="body">MIP: CPLEX, Gurobi, Cbc or HiGHS. NLP: Ipopt, Uno, or any NLP solver in GAMS</p></div>
+        <div class="shot-rows__row"><p class="label">Interfaces</p><p class="body">GAMSPy, GAMS, Python (SHOTpy), C++, the command line, and AMPL, Pyomo and JuMP through ASL</p></div>
+        <div class="shot-rows__row"><p class="label">Formats</p><p class="body">OSiL, AMPL <code class="shot-inline-code">.nl</code> and GAMS <code class="shot-inline-code">.gms</code></p></div>
+        <div class="shot-rows__row"><p class="label">Community</p><p class="body">A <a class="link" href="https://www.coin-or.org">COIN-OR</a> project, winner of the COIN-OR Cup 2018, licensed under EPL-2.0</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="method" aria-labelledby="method-title">
+    <div class="wrap">
+      <div class="section-head">
+        <Heading eyebrow="02 — Method" id="method-title">
+          Dual and primal strategies
+          <Fragment slot="lead">
+            The outer approximation gives a lower bound on the objective, feasible solutions an upper bound. SHOT terminates when the gap
+            between them is within tolerance.
+          </Fragment>
+        </Heading>
+      </div>
+      <EshDemo />
+      <div class="grid-2" style="margin-top: var(--space-8)">
+        <article class="shot-card">
+          <p class="label shot-eyebrow">Dual strategy</p>
+          <h3 class="heading">Polyhedral outer approximation</h3>
+          <ul class="shot-list body">
+            <li>Supporting hyperplanes (ESH) or cutting planes (ECP) build an outer approximation of the nonlinear feasible set.</li>
+            <li>The MIP subsolver (CPLEX, Gurobi, Cbc or HiGHS) gives the dual bound, the minimum within the approximation.</li>
+            <li>Single-tree (branch and cut) or multi-tree, and with quadratic MIQP and MIQCQP subproblems where the subsolver supports them.</li>
+          </ul>
+        </article>
+        <article class="shot-card shot-card--ink">
+          <p class="label shot-eyebrow">Primal strategy</p>
+          <h3 class="heading">Deterministic heuristics</h3>
+          <ul class="shot-list body">
+            <li>Checking the solutions in the MIP solver's solution pool against the nonlinear constraints.</li>
+            <li>Solving NLP problems with the integer variables fixed, with Ipopt, Uno, GAMS or SHOT itself.</li>
+            <li>Root searches between infeasible and feasible points.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="capability" aria-labelledby="capability-title">
+    <div class="wrap split">
+      <div class="stack">
+        <Heading eyebrow="03 — Capability" id="capability-title">What is solved to global optimality?</Heading>
+        <p class="body body-text measure" style="margin-top: var(--space-5)">
+          It depends on the MIP subsolver. Nonconvex problems are always solved with valid bounds, but the gap may not close. If all
+          nonconvexities can be reformulated into convex form, for example bilinear terms with a discrete variable, the solution is global.
+        </p>
+        <p class="small muted">
+          More in <a class="link" href="https://doi.org/10.1007/s10898-021-01006-1">Lundell and Kronqvist (2022)</a>.
+        </p>
+      </div>
+      <div class="table-wrap">
+        <table class="shot-table body">
+          <thead>
+            <tr>
+              <th scope="col">Problem type</th>
+              {solvers.map((s) => (s === 'HiGHS' ? <th scope="col" class="is-new">{s}<span class="shot-table__new">new</span></th> : <th scope="col">{s}</th>))}
+            </tr>
+          </thead>
+          <tbody>
+            {
+              capability.map(([type, marks]) => (
+                <tr>
+                  <th scope="row">{type}</th>
+                  {marks.map((m, i) => (
+                    <td class:list={[{ 'is-new': solvers[i] === 'HiGHS', 'shot-unknown': m === 'unknown' }]}>
+                      {m === 'yes' && <Icon name="check" class="shot-check" label="Global" />}
+                      {m === 'direct' && <span class="shot-ring"><Icon name="check" class="shot-check" label="Global, handled directly by the subsolver" /></span>}
+                      {m === 'unknown' && <span aria-label="No guarantee">?</span>}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+        <ul class="shot-legend small" style="margin-top: var(--space-4)">
+          <li><Icon name="check" class="shot-check" /> Solved to global optimality</li>
+          <li><span class="shot-ring" style="width:22px;height:22px"><Icon name="check" class="shot-check" /></span> Handled directly by the subsolver</li>
+          <li><span class="shot-unknown">?</span> No guarantee that a solution is found</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section--band band" id="shot-2" aria-labelledby="v2-title">
+    <div class="band__art" role="img" aria-label="A convex function drawn as a white wireframe over its faceted polyhedral outer approximation, cut away to show the gap between them."></div>
+    <div class="wrap band__inner">
+      <div class="band__copy">
+        <header class="shot-heading">
+          <p class="label shot-eyebrow">Release candidate</p>
+          <h2 class="title" id="v2-title">What's new in <span class="shot-hl">SHOT 2.0</span></h2>
+          <p class="lead">A Python interface, HiGHS as MIP subsolver, and callbacks that let you take part in the solution process.</p>
+        </header>
+        <ul class="band__list">
+          <li><span class="band__mark" aria-hidden="true"></span><span>SHOTpy, a native Python interface<small>Build problems in Python or read <code>.nl</code>, <code>.gms</code> and OSiL files</small></span></li>
+          <li><span class="band__mark" aria-hidden="true"></span><span>HiGHS as MIP subsolver<small>A fully open-source toolchain with Cbc, HiGHS and Ipopt</small></span></li>
+          <li><span class="band__mark" aria-hidden="true"></span><span>Extended callbacks<small>Inject solutions, cuts, dual bounds and interior points</small></span></li>
+          <li><span class="band__mark" aria-hidden="true"></span><span>Decomposition of convex quadratics<small>Eigenvalue and LDLᵀ lifting reformulations</small></span></li>
+          <li><span class="band__mark" aria-hidden="true"></span><span>Better nonconvex handling<small>Convex bounding and repair of infeasible subproblems</small></span></li>
+        </ul>
+        <div class="hero__actions" style="margin-top: var(--space-6)">
+          {latestRelease && <a class="shot-btn shot-btn--ghost" href={newsUrl(latestRelease)}>Read the announcement</a>}
+          <Command cmd="pip install SHOTpy" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="news" aria-labelledby="news-title">
+    <div class="wrap">
+      <div class="section-head">
+        <Heading eyebrow="04 — News" id="news-title">Latest from the project</Heading>
+        <a class="more-link" href="/news/"><span>All news and releases</span><Icon name="arrow-right" /></a>
+      </div>
+      <div class="news-compact">
+        {
+          latest.map((n) => (
+            <a href={newsUrl(n)}>
+              <p class="meta label">
+                <span>{newsTypes[n.data.type].label}</span>
+                <span>{formatDate(n)}</span>
+              </p>
+              <h3 class="heading">{n.data.title}</h3>
+              <p class="small body-text">{n.data.summary}</p>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="cite" aria-labelledby="cite-title">
+    <div class="wrap split">
+      <div class="stack">
+        <Heading eyebrow="05 — Cite" id="cite-title">Using SHOT in research?</Heading>
+        <p class="body body-text measure" style="margin-top: var(--space-5)">
+          Please cite the SHOT paper. If you use SHOT on nonconvex problems, please also cite the paper on its nonconvex features.
+        </p>
+        <p><a class="more-link" href="/publications/"><span>All publications and BibTeX</span><Icon name="arrow-right" /></a></p>
+      </div>
+      <div class="stack">
+        <Reference pub={mainPaper} label="The SHOT paper" />
+        <Reference pub={nonconvexPaper} label="Nonconvex MINLP" />
+      </div>
+    </div>
+  </section>
+</Base>

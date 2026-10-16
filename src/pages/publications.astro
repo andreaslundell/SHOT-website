@@ -1,0 +1,95 @@
+---
+import Base from '../layouts/Base.astro';
+import Heading from '../components/Heading.astro';
+import Icon from '../components/Icon.astro';
+import CodeBlock from '../components/CodeBlock.astro';
+import { groups, pubHref, benchmarkFiles, mainPaper, nonconvexPaper } from '../data/publications';
+
+const citeBib = [mainPaper.bibtex, nonconvexPaper.bibtex].join('\n\n');
+---
+
+<Base title="Publications" description="Papers describing SHOT and the extended supporting hyperplane method, how to cite SHOT, and benchmarks of MINLP solvers.">
+  <div class="wrap">
+    <div class="page-head">
+      <Heading eyebrow="Research" level={1} size="display">
+        Publications
+        <Fragment slot="lead">The methods in SHOT are described in peer-reviewed papers. If you use SHOT in your research, please cite it.</Fragment>
+      </Heading>
+    </div>
+
+    <section class="section split" style="padding-top: var(--space-7)" aria-labelledby="bib-title">
+      <div class="stack">
+        <h2 class="heading" id="bib-title">BibTeX</h2>
+        <p class="body body-text">Both SHOT papers, ready for your bibliography. The SHOT paper is open access.</p>
+      </div>
+      <CodeBlock code={citeBib} lang="bibtex" file="shot.bib" />
+    </section>
+
+    {
+      groups.map((g) => (
+        <section class="section" id={g.id} aria-labelledby={`${g.id}-title`}>
+          <div class="section-head" style="margin-bottom: var(--space-5)">
+            <Heading eyebrow={g.label} id={`${g.id}-title`}>
+              {g.title}
+              {g.intro && <Fragment slot="lead">{g.intro}</Fragment>}
+            </Heading>
+          </div>
+          {g.id === 'benchmarks' && (
+            <figure class="shot-figure" style="margin-bottom: var(--space-6)">
+              <div class="shot-figure__frame">
+                <img
+                  src="/images/figures/benchmark-highs.png"
+                  alt="Solution profiles on 377 convex MINLP instances from MINLPLib: the number of instances solved to an objective gap of at most 0.1 % against solution time, for SHOT with Gurobi, Cbc, Cbc with one thread and HiGHS, and for SCIP."
+                  width="2000"
+                  height="943"
+                  loading="lazy"
+                />
+              </div>
+              <figcaption class="small muted">
+                SHOT 2.0 with different MIP subsolvers, and SCIP. Convex MINLP: the 377 convex instances in MINLPLib; solved means objective
+                gap ≤ 0.1 %. From the SIAM OP26 talk.
+              </figcaption>
+            </figure>
+          )}
+          <ol class="pubs">
+            {[...g.items]
+              .sort((a, b) => b.year - a.year)
+              .map((p) => {
+                const href = pubHref(p);
+                return (
+                  <li class="pub" id={p.id}>
+                    <span class="pub__year">{p.year}</span>
+                    <div class="pub__body">
+                      <p class="pub__title">{href ? <a href={href}>{p.title}</a> : p.title}</p>
+                      <p class="small pub__authors">{p.authors.join(', ')}</p>
+                      <p class="small pub__venue">
+                        <i>{p.venue}</i>{p.details && `, ${p.details}`}
+                      </p>
+                      <p class="pub__tags small">
+                        {p.doi && <span class="code">doi:{p.doi}</span>}
+                        {p.openAccess && <span class="label oa">Open access</span>}
+                      </p>
+                    </div>
+                    <div class="pub__actions">
+                      {href && (
+                        <a class="shot-btn shot-btn--ghost shot-btn--sm" href={href} aria-label={`Read: ${p.title}`}>
+                          Read <Icon name="external" />
+                        </a>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+          </ol>
+          {g.id === 'benchmarks' && (
+            <p style="margin-top: var(--space-5)">
+              <a class="more-link" href={benchmarkFiles}><span>Benchmark files and results</span><Icon name="arrow-right" /></a>
+              &nbsp;&nbsp;
+              <a class="more-link" href="https://plato.asu.edu/bench.html"><span>Mittelmann's MINLP benchmarks</span><Icon name="arrow-right" /></a>
+            </p>
+          )}
+        </section>
+      ))
+    }
+  </div>
+</Base>

@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+import Heading from '../components/Heading.astro';
+---
+
+<Base title="Page not found">
+  <div class="wrap notfound">
+    <Heading eyebrow="404" level={1} size="display">
+      Outside the <span class="shot-hl">feasible set</span>
+      <Fragment slot="lead">This page does not exist, or it has moved.</Fragment>
+    </Heading>
+    <p class="hero__actions" style="margin-top: var(--space-6)">
+      <a class="shot-btn shot-btn--accent" href="/">Go to the home page</a>
+      <a class="shot-btn shot-btn--ghost" href="/getting-started/">Get started</a>
+    </p>
+  </div>
+</Base>

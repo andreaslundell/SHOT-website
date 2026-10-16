@@ -1,0 +1,65 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { getNews, formatDate, newsUrl, newsTypes, type NewsEntry } from '../../data/news';
+
+export async function getStaticPaths() {
+  const news = await getNews();
+  return news.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, newer: news[i - 1], older: news[i + 1] },
+  }));
+}
+
+interface Props {
+  entry: NewsEntry;
+  newer?: NewsEntry;
+  older?: NewsEntry;
+}
+const { entry, newer, older } = Astro.props;
+const { Content } = await render(entry);
+const t = newsTypes[entry.data.type];
+---
+
+<Base title={entry.data.title} description={entry.data.summary}>
+  <article class="wrap">
+    <header class="article-head">
+      <a class="backlink small" href="/news/"><Icon name="arrow-right" /> All news</a>
+      <p class="label shot-eyebrow"><Icon name={t.icon} /> {t.label}{entry.data.version && ` · ${entry.data.version}`}</p>
+      <h1 class="title">{entry.data.title}</h1>
+      <p class="lead body-text">{entry.data.summary}</p>
+      <p class="article-meta small">
+        <time datetime={entry.data.date.toISOString().slice(0, 10)}>{formatDate(entry)}</time>
+        {entry.data.link && <a class="link" href={entry.data.link}>{new URL(entry.data.link).hostname.replace(/^www\./, '')}</a>}
+      </p>
+    </header>
+    <div class="prose body">
+      <Content />
+    </div>
+    <nav class="grid-2" style="margin-top: var(--space-9); max-width: var(--measure)" aria-label="More news">
+      {
+        older ? (
+          <a class="news-compact-link" href={newsUrl(older)}>
+            <span class="label muted">Older</span>
+            <span class="heading">{older.data.title}</span>
+          </a>
+        ) : <span />
+      }
+      {
+        newer && (
+          <a class="news-compact-link" href={newsUrl(newer)} style="text-align: right">
+            <span class="label muted">Newer</span>
+            <span class="heading">{newer.data.title}</span>
+          </a>
+        )
+      }
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .news-compact-link { display: flex; flex-direction: column; gap: var(--space-2); padding-top: var(--space-4); border-top: var(--stroke-strong) solid var(--ink); color: var(--ink); text-decoration: none; }
+  .news-compact-link:hover .heading { text-decoration: underline; text-decoration-color: var(--shot-red); text-underline-offset: 4px; }
+  .news-compact-link .label { text-transform: uppercase; }
+</style>

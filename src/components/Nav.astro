@@ -1,0 +1,40 @@
+---
+import Icon from './Icon.astro';
+import { repoUrl } from '../data/github';
+
+const links = [
+  { href: '/getting-started/', label: 'Get started' },
+  { href: '/news/', label: 'News' },
+  { href: '/publications/', label: 'Publications' },
+  { href: '/team/', label: 'Team' },
+];
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => path === href || path.startsWith(href);
+---
+
+<header class="nav" data-nav>
+  <div class="wrap nav__row">
+    <a class="nav__brand" href="/" aria-label="SHOT home">
+      <img class="only-light" src="/images/logo/shot-logo.png" alt="SHOT" width="400" height="147" />
+      <img class="only-dark" src="/images/logo/shot-logo-dark.png" alt="SHOT" width="400" height="147" />
+    </a>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" data-nav-toggle>
+      <span class="visually-hidden">Menu</span>
+      <Icon name="bars" />
+    </button>
+    <ul class="nav__links body" id="nav-links">
+      {
+        links.map((l) => (
+          <li>
+            <a href={l.href} aria-current={isCurrent(l.href) ? 'page' : undefined}>
+              {l.label}
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <a href={repoUrl}><Icon name="github" /> GitHub</a>
+      </li>
+    </ul>
+  </div>
+</header>

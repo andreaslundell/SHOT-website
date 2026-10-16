@@ -1,0 +1,22 @@
+---
+import Icon from './Icon.astro';
+import { pubHref, type Publication } from '../data/publications';
+
+interface Props {
+  pub: Publication;
+  label?: string;
+}
+const { pub, label = 'Reference' } = Astro.props;
+const href = pubHref(pub);
+---
+
+<div class="shot-ref">
+  <div class="shot-ref__tile" aria-hidden="true"><Icon name="book" /></div>
+  <div class="shot-ref__text">
+    <p class="label shot-eyebrow">{label}</p>
+    <p class="small">
+      <b>{pub.authors.join(', ')}</b>. {pub.title}. <i>{pub.venue}</i>{pub.details && `, ${pub.details}`}, {pub.year}.
+      {href && <a class="link" href={href}>{pub.doi ? `doi:${pub.doi}` : 'Link'}</a>}
+    </p>
+  </div>
+</div>

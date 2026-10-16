@@ -1,0 +1,80 @@
+---
+// Font Awesome Free 6 icons rendered to inline SVG at build time, so no icon script is shipped.
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import {
+  faArrowRight,
+  faArrowUpRightFromSquare,
+  faBook,
+  faCheck,
+  faCopy,
+  faGlobe,
+  faPaperPlane,
+  faPlay,
+  faPause,
+  faForwardStep,
+  faRotateLeft,
+  faShuffle,
+  faBars,
+  faXmark,
+  faFileLines,
+  faCircleHalfStroke,
+  faSun,
+  faMoon,
+  faRss,
+  faTag,
+  faMicrophone,
+  faNewspaper,
+  faBullhorn,
+} from '@fortawesome/free-solid-svg-icons';
+import { faGithub, faPython } from '@fortawesome/free-brands-svg-icons';
+
+const icons: Record<string, IconDefinition> = {
+  'arrow-right': faArrowRight,
+  external: faArrowUpRightFromSquare,
+  book: faBook,
+  check: faCheck,
+  copy: faCopy,
+  globe: faGlobe,
+  'paper-plane': faPaperPlane,
+  play: faPlay,
+  pause: faPause,
+  step: faForwardStep,
+  reset: faRotateLeft,
+  shuffle: faShuffle,
+  bars: faBars,
+  close: faXmark,
+  file: faFileLines,
+  theme: faCircleHalfStroke,
+  sun: faSun,
+  moon: faMoon,
+  rss: faRss,
+  release: faTag,
+  talk: faMicrophone,
+  paper: faNewspaper,
+  news: faBullhorn,
+  github: faGithub,
+  python: faPython,
+};
+
+interface Props {
+  name: keyof typeof icons | string;
+  class?: string;
+  label?: string;
+}
+const { name, class: cls, label } = Astro.props;
+const def = icons[name];
+if (!def) throw new Error(`Unknown icon: ${name}`);
+const [w, h, , , path] = def.icon;
+const d = Array.isArray(path) ? path.join(' ') : path;
+---
+
+<svg
+  class:list={['icon', cls]}
+  viewBox={`0 0 ${w} ${h}`}
+  width="1em"
+  height="1em"
+  fill="currentColor"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"><path d={d}></path></svg>

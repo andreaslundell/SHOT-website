@@ -1,0 +1,144 @@
+---
+import Base from '../layouts/Base.astro';
+import Heading from '../components/Heading.astro';
+import Icon from '../components/Icon.astro';
+import { developers, contributors, openSource, commercial, supporters, funders, type Person } from '../data/team';
+import { getContributors, repoUrl } from '../data/github';
+
+const gh = await getContributors();
+const initials = (p: Person) => p.name.split(' ').map((s) => s[0]).join('');
+---
+
+<Base title="Team and contributors" description="The developers and contributors of SHOT, the open-source projects it builds on, and the organizations that have supported it.">
+  <div class="wrap">
+    <div class="page-head">
+      <Heading eyebrow="Community" level={1} size="display">
+        Team and contributors
+        <Fragment slot="lead">
+          SHOT is developed at Åbo Akademi University with collaborators, and is part of <a class="link" href="https://www.coin-or.org">COIN-OR</a>.
+        </Fragment>
+      </Heading>
+    </div>
+
+    <section class="section" style="padding-top: var(--space-7)" aria-labelledby="dev-title">
+      <h2 class="label shot-eyebrow" id="dev-title" style="margin-bottom: var(--space-5)">Main developers</h2>
+      <div class="people people--lead">
+        {
+          developers.map((p) => (
+            <article class="person">
+              <div class="person__mark" aria-hidden="true">
+                {p.github ? <img src={`https://github.com/${p.github}.png?size=144`} alt="" width="72" height="72" loading="lazy" /> : initials(p)}
+              </div>
+              <div class="person__body">
+                <h3 class="heading person__name">{p.url ? <a href={p.url}>{p.name}</a> : p.name}</h3>
+                <p class="body">{p.role}</p>
+                <p class="small muted">{p.affiliation}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+      <h2 class="label shot-eyebrow" style="margin: var(--space-7) 0 var(--space-5)">Contributors</h2>
+      <div class="people">
+        {
+          contributors.map((p) => (
+            <article class="person">
+              <div class="person__mark" aria-hidden="true">
+                {p.github ? <img src={`https://github.com/${p.github}.png?size=144`} alt="" width="72" height="72" loading="lazy" /> : initials(p)}
+              </div>
+              <div class="person__body">
+                <h3 class="heading person__name">{p.url ? <a href={p.url}>{p.name}</a> : p.name}</h3>
+                <p class="body">{p.role}</p>
+                <p class="small muted">{p.affiliation}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="gh-title">
+      <div class="section-head" style="margin-bottom: var(--space-5)">
+        <Heading eyebrow="GitHub" id="gh-title">
+          Code contributors
+          <Fragment slot="lead">Everyone who has contributed to the repository, by number of commits.</Fragment>
+        </Heading>
+        <a class="more-link" href={`${repoUrl}/graphs/contributors`}><span>Contributor graph</span><Icon name="arrow-right" /></a>
+      </div>
+      <ul class="gh-grid">
+        {
+          gh.map((c) => (
+            <li>
+              <a class="gh" href={c.url}>
+                <img src={c.avatar} alt="" width="40" height="40" loading="lazy" />
+                <span>
+                  <b>{c.login}</b>
+                  <small>{c.contributions} {c.contributions === 1 ? 'commit' : 'commits'}</small>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="small muted" style="margin-top: var(--space-4)">
+        Want to contribute? Read the <a class="link" href={`${repoUrl}/blob/master/CODE_OF_CONDUCT.md`}>code of conduct</a> and
+        open an <a class="link" href={`${repoUrl}/issues`}>issue</a> or a pull request.
+      </p>
+    </section>
+
+    <section class="section" aria-labelledby="os-title">
+      <div class="section-head" style="margin-bottom: var(--space-6)">
+        <Heading eyebrow="Open source" id="os-title">
+          Built on open-source software
+          <Fragment slot="lead">SHOT connects to, or uses code from, these projects.</Fragment>
+        </Heading>
+      </div>
+      <div class="linkcols">
+        {
+          openSource.map((g) => (
+            <div>
+              <h3 class="label shot-eyebrow">{g.group}</h3>
+              <ul class="body">
+                {g.items.map((l) => (
+                  <li>
+                    <a href={l.url}>{l.name}</a>
+                    {l.note && <small>{l.note}</small>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+      <div class="shot-note" style="margin-top: var(--space-7)">
+        <p class="label shot-eyebrow">Commercial software</p>
+        <p class="body body-text measure">
+          SHOT can also use
+          {
+            commercial.map((l, i) => (
+              <>
+                <a class="link" href={l.url}>{l.name}</a>
+                {i < commercial.length - 2 ? ', ' : i === commercial.length - 2 ? ' and ' : ''}
+              </>
+            ))
+          }
+          {' '}when they are installed and licensed.
+        </p>
+      </div>
+    </section>
+
+    <section class="section split" aria-labelledby="support-title">
+      <div class="stack">
+        <Heading eyebrow="Support" id="support-title">Thanks to our backers</Heading>
+        <p class="body body-text" style="margin-top: var(--space-5)">{supporters}</p>
+      </div>
+      <div class="shot-card shot-card--ink">
+        <p class="label shot-eyebrow">Funding</p>
+        <h3 class="heading">The development of SHOT has been funded by</h3>
+        <ul class="shot-list body">
+          {funders.map((f) => <li>{f}</li>)}
+        </ul>
+      </div>
+    </section>
+  </div>
+</Base>

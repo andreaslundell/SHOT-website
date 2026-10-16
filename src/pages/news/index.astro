@@ -1,0 +1,89 @@
+---
+import Base from '../../layouts/Base.astro';
+import Heading from '../../components/Heading.astro';
+import Icon from '../../components/Icon.astro';
+import { getNews, formatDate, newsUrl, newsTypes } from '../../data/news';
+import { repoUrl } from '../../data/github';
+
+const news = await getNews();
+const counts = Object.fromEntries(Object.keys(newsTypes).map((t) => [t, news.filter((n) => n.data.type === t).length]));
+const types = (Object.keys(newsTypes) as (keyof typeof newsTypes)[]).filter((t) => counts[t] > 0);
+---
+
+<Base title="News and releases" description="News, releases, papers and talks about SHOT, the open-source MINLP solver.">
+  <div class="wrap">
+    <div class="page-head">
+      <Heading eyebrow="News" level={1} size="display">
+        News and releases
+        <Fragment slot="lead">
+          Releases, papers and talks. Source code for every release is on <a class="link" href={`${repoUrl}/releases`}>GitHub</a>, and
+          SHOTpy versions are on <a class="link" href="https://pypi.org/project/SHOTpy/#history">PyPI</a>.
+        </Fragment>
+      </Heading>
+    </div>
+
+    <section class="section" style="padding-top: var(--space-7)">
+      <div class="filters" role="group" aria-label="Filter by type" data-filters>
+        <button class="chip" type="button" data-filter="all" aria-pressed="true">All <span class="count">{news.length}</span></button>
+        {
+          types.map((t) => (
+            <button class="chip" type="button" data-filter={t} aria-pressed="false">
+              <Icon name={newsTypes[t].icon} /> {newsTypes[t].plural} <span class="count">{counts[t]}</span>
+            </button>
+          ))
+        }
+        <a class="chip" href="/news/rss.xml" style="text-decoration:none; margin-left:auto"><Icon name="rss" /> RSS</a>
+      </div>
+      <ol class="newslist" data-newslist>
+        {
+          news.map((n) => (
+            <li class="newsitem" data-type={n.data.type}>
+              <div class="newsitem__meta">
+                <span class="newsitem__type label">
+                  <Icon name={newsTypes[n.data.type].icon} /> {newsTypes[n.data.type].label}
+                </span>
+                <time class="small" datetime={n.data.date.toISOString().slice(0, 10)}>{formatDate(n)}</time>
+              </div>
+              <div class="newsitem__body">
+                <h2 class="heading newsitem__title">
+                  <a href={newsUrl(n)}>{n.data.title}</a>
+                  {n.data.version && <span class="newsitem__version">{n.data.version}</span>}
+                </h2>
+                <p class="body newsitem__summary">{n.data.summary}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="small muted" data-empty hidden>Nothing of this type yet.</p>
+    </section>
+  </div>
+</Base>
+
+<script>
+  // Filter by type; ?type=release in the URL selects a filter (used by the redirect from the old site).
+  const group = document.querySelector<HTMLElement>('[data-filters]');
+  const items = [...document.querySelectorAll<HTMLElement>('[data-newslist] > li')];
+  const empty = document.querySelector<HTMLElement>('[data-empty]');
+  const buttons = [...(group?.querySelectorAll<HTMLButtonElement>('[data-filter]') ?? [])];
+
+  function apply(type: string, push = false) {
+    if (!buttons.some((b) => b.dataset.filter === type)) type = 'all';
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === type)));
+    let shown = 0;
+    for (const li of items) {
+      const on = type === 'all' || li.dataset.type === type;
+      li.hidden = !on;
+      if (on) shown++;
+    }
+    if (empty) empty.hidden = shown > 0;
+    if (push) {
+      const url = new URL(location.href);
+      if (type === 'all') url.searchParams.delete('type');
+      else url.searchParams.set('type', type);
+      history.replaceState(null, '', url);
+    }
+  }
+  buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.filter ?? 'all', true)));
+  apply(new URLSearchParams(location.search).get('type') ?? 'all');
+</script>

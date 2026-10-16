@@ -1,0 +1,17 @@
+---
+// Eyebrow + title (+ lead), as in the brand Heading component.
+interface Props {
+  eyebrow?: string;
+  level?: 1 | 2;
+  size?: 'display' | 'title';
+  id?: string;
+}
+const { eyebrow, level = 2, size = 'title', id } = Astro.props;
+const H = `h${level}` as 'h1' | 'h2';
+---
+
+<header class="shot-heading">
+  {eyebrow && <p class="label shot-eyebrow">{eyebrow}</p>}
+  <H class={size} id={id}><slot /></H>
+  {Astro.slots.has('lead') && <p class="lead shot-lead body-text"><slot name="lead" /></p>}
+</header>

@@ -1,0 +1,337 @@
+---
+import Base from '../layouts/Base.astro';
+import Heading from '../components/Heading.astro';
+import Icon from '../components/Icon.astro';
+import Command from '../components/Command.astro';
+import CodeBlock from '../components/CodeBlock.astro';
+import { repoUrl } from '../data/github';
+
+const docs = `${repoUrl}/blob/master/docs`;
+
+const install = [
+  {
+    id: 'pip',
+    label: 'Python',
+    text: 'The SHOTpy wheels include SHOT with the open-source subsolvers Cbc, Ipopt and HiGHS, and need Python 3.11 or later. They are built for Linux (x86-64) and macOS (Apple silicon, macOS 14 and later); elsewhere, pip compiles SHOT from source.',
+    code: 'pip install SHOTpy',
+    lang: 'bash',
+    file: 'terminal',
+    after: 'Public wheels cannot include CPLEX, Gurobi or GAMS. If one of them is installed and licensed on your computer, build SHOTpy from source with it:',
+    code2: `pip install SHOTpy --no-binary SHOTpy \\
+    --config-settings=cmake.define.HAS_GUROBI=on \\
+    --config-settings=cmake.define.GUROBI_DIR=/opt/gurobi1103/linux64`,
+    note: 'Use the same pattern with HAS_CPLEX and CPLEX_DIR, or HAS_GAMS and GAMS_DIR.',
+  },
+  {
+    id: 'gams',
+    label: 'GAMS and GAMSPy',
+    text: 'SHOT is included in GAMS and in GAMSPy, its Python modeling library. If you have either, you already have SHOT, and inside GAMS it can use any licensed NLP solver as subsolver. This is the easiest way to use SHOT.',
+    code: 'pip install gamspy',
+    lang: 'bash',
+    file: 'terminal',
+    links: [
+      { href: 'https://gamspy.readthedocs.io', label: 'GAMSPy documentation' },
+      { href: 'https://www.gams.com/latest/docs/S_SHOT.html', label: 'SHOT in the GAMS documentation' },
+    ],
+  },
+  {
+    id: 'neos',
+    label: 'NEOS',
+    text: 'To try SHOT without installing anything, submit a model in GAMS format to SHOT on the NEOS Server, a free internet-based service for numerical optimization.',
+    links: [{ href: 'https://neos-server.org/neos/solvers/minco:SHOT/GAMS.html', label: 'SHOT on the NEOS Server' }],
+  },
+  {
+    id: 'source',
+    label: 'From source',
+    text: 'SHOT compiles on Linux and macOS with CMake and a C++17 compiler; on Windows, use the Windows Subsystem for Linux. It needs at least one MIP solver (Cbc, CPLEX, Gurobi or HiGHS) and an NLP solver (Ipopt or GAMS). HiGHS is compiled from its submodule by default.',
+    code: `git clone https://github.com/coin-or/SHOT.git
+cd SHOT
+git submodule update --init --recursive
+
+# An open-source build with Cbc, Ipopt and HiGHS
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \\
+  -DHAS_GAMS=off -DHAS_CPLEX=off -DHAS_GUROBI=off
+cmake --build build --parallel`,
+    lang: 'bash',
+    file: 'terminal',
+    after: 'This builds the SHOT executable and the libSHOTSolver library in build/. Add -DHAS_PYTHON=on to also build SHOTpy. Check the CMake output for lines saying that a solver was not found; such a solver is then left out of the build.',
+    links: [{ href: `${docs}/CompilationInstructions.md`, label: 'Full compilation instructions' }],
+  },
+];
+
+const usage = [
+  {
+    id: 'python',
+    label: 'SHOTpy',
+    file: 'example.py',
+    lang: 'python',
+    code: `import SHOTpy
+
+solver = SHOTpy.Solver()
+problem = SHOTpy.Problem(solver)
+
+x = problem.addVariable("x", SHOTpy.VariableType.Real, 0.0, 10.0)
+y = problem.addVariable("y", SHOTpy.VariableType.Integer, 0.0, 10.0)
+
+problem.setObjective(SHOTpy.exp(x) + (y - 2.5)**2)
+problem.addConstraint(x + y >= 3, "c")
+problem.finalize()
+
+solver.setProblem(problem)
+solver.solveProblem()
+
+print(solver.getModelReturnStatus(), solver.getPrimalSolution().point)`,
+    text: 'Build the problem with the API, or read it from a file with solver.setProblem("problem.nl"), which also accepts .gms and .osil files. The tutorial notebook covers nonlinear expressions, settings and callbacks.',
+    link: { href: `${docs}/SHOTpy_Tutorial.ipynb`, label: 'SHOTpy tutorial' },
+  },
+  {
+    id: 'gamspy',
+    label: 'GAMSPy',
+    file: 'example.py',
+    lang: 'python',
+    code: `import gamspy as gp
+
+m = gp.Container()
+
+x = gp.Variable(m, name="x", type="integer")
+y = gp.Variable(m, name="y", type="positive")
+x.up = 10
+y.up = 10
+
+con = gp.Equation(m, name="con")
+con[...] = gp.math.sqr(x - 4) + gp.math.sqr(y - 3) <= 4
+
+model = gp.Model(m, name="model", equations=[con], problem="MINLP",
+                 sense=gp.Sense.MIN, objective=2 * x + y)
+model.solve(solver="SHOT")
+print(model.objective_value)`,
+    text: 'Pass solver="SHOT" to solve() for MINLP and MIQCP models.',
+    link: { href: 'https://gamspy.readthedocs.io', label: 'GAMSPy documentation' },
+  },
+  {
+    id: 'gams-model',
+    label: 'GAMS',
+    file: 'model.gms',
+    lang: 'txt',
+    code: `* Select SHOT for the problem class, in the model or on the command line
+option minlp = shot;
+
+solve mymodel using minlp minimizing obj;`,
+    text: 'You can also set it on the command line, e.g., gams model.gms minlp=shot. To use your own build of SHOT in GAMS, add it as a solver in gamsconfig.yaml.',
+    link: { href: 'https://www.gams.com/latest/docs/UG_GamsCall.html#UG_GamsCall_GAMSConfigYAML', label: 'GAMS configuration' },
+  },
+  {
+    id: 'pyomo',
+    label: 'Pyomo',
+    file: 'example.py',
+    lang: 'python',
+    code: `import pyomo.environ as pyo
+
+model = pyo.ConcreteModel()
+# ... variables, constraints and objective ...
+
+# SHOT is called through the AMPL Solver Library (ASL) interface
+solver = pyo.SolverFactory("asl:SHOT")  # or add executable="/path/to/SHOT"
+solver.solve(model, tee=True)`,
+    text: 'The SHOT executable must be on your path, or given with executable. With GAMS installed, you can also use SHOT through the Pyomo GAMS interface.',
+    link: { href: 'https://www.pyomo.org', label: 'Pyomo' },
+  },
+  {
+    id: 'jump',
+    label: 'JuMP',
+    file: 'example.jl',
+    lang: 'julia',
+    code: `using JuMP, AmplNLWriter
+
+model = Model(() -> AmplNLWriter.Optimizer("SHOT"))  # or the full path to SHOT
+# ... variables, constraints and objective ...
+optimize!(model)`,
+    text: 'JuMP calls SHOT through AmplNLWriter.jl, which writes the model in AMPL .nl format. A native JuMP interface is on the roadmap after SHOT 2.0.',
+    link: { href: 'https://github.com/jump-dev/AmplNLWriter.jl', label: 'AmplNLWriter.jl' },
+  },
+  {
+    id: 'ampl',
+    label: 'AMPL',
+    file: 'terminal',
+    lang: 'bash',
+    code: `# SHOT reads the .nl file and writes problem.sol next to it
+./SHOT problem.nl --AMPL`,
+    text: 'SHOT works with any modeling system that uses the AMPL Solver Library: models in .nl format and solutions in .sol format. In AMPL, set SHOT as the solver with option solver.',
+    link: { href: 'https://ampl.com', label: 'AMPL' },
+  },
+  {
+    id: 'cli',
+    label: 'Command line',
+    file: 'terminal',
+    lang: 'bash',
+    code: `./SHOT problem.osil                 # OSiL is always supported
+./SHOT problem.nl --timelimit=60    # AMPL
+./SHOT problem.gms --mip=highs      # GAMS
+./SHOT --help                       # what this build supports`,
+    text: 'SHOT prints the dual and primal bounds as it iterates, and writes the solution in OSrL format and a log to SHOT.log.',
+    link: { href: `${docs}/CommandLineUsage.md`, label: 'Command-line reference' },
+  },
+  {
+    id: 'cpp',
+    label: 'C++',
+    file: 'example.cpp',
+    lang: 'cpp',
+    code: `#include "Solver.h"
+
+auto solver = std::make_unique<SHOT::Solver>();
+solver->updateSetting("Termination.TimeLimit", 60.0);
+
+if(solver->setProblem("problem.osil") && solver->solveProblem())
+{
+    double primal = solver->getPrimalBound();
+    double dual = solver->getCurrentDualBound();
+}`,
+    text: 'Link against libSHOTSolver to embed SHOT in other software; the console application is a thin wrapper around this API. Callbacks are registered with registerCallback.',
+    link: { href: `${docs}/Callbacks.md`, label: 'Callbacks' },
+  },
+];
+
+const flags: [string, string][] = [
+  ['--convex', 'Assume that the problem is convex'],
+  ['--mip=<cbc|highs|cplex|gurobi>', 'Select the MIP solver of the dual strategy'],
+  ['--nlp=<ipopt|gams|shot|uno>', 'Select the NLP solver of the primal strategy'],
+  ['--tree=<single|multi>', 'Single-tree (branch and cut, CPLEX and Gurobi) or multi-tree strategy'],
+  ['--threads=<n>', 'Maximum number of threads'],
+  ['--absgap=<value>', 'Absolute objective gap tolerance'],
+  ['--relgap=<value>', 'Relative objective gap tolerance'],
+  ['--timelimit=<value>', 'Time limit in seconds'],
+  ['--debug[=<directory>]', 'Write intermediate problems and solutions'],
+];
+---
+
+<Base title="Get started" description="Install SHOT with pip, use it from GAMSPy, GAMS, Pyomo, JuMP, AMPL, C++ or the command line, and set its options.">
+  <div class="wrap">
+    <div class="page-head">
+      <Heading eyebrow="Documentation" level={1} size="display">
+        Get started
+        <Fragment slot="lead">Install SHOT, solve a first problem from the interface you already use, and set its options.</Fragment>
+      </Heading>
+    </div>
+
+    <section class="step" aria-labelledby="install-title">
+      <div class="step__num" aria-hidden="true">01</div>
+      <div class="step__body">
+        <h2 class="title" id="install-title">Install</h2>
+        <div class="tabs" data-tabs data-tabs-key="install">
+          <div class="tabs__list" role="tablist" aria-label="Ways to install SHOT">
+            {
+              install.map((t, i) => (
+                <button class="tabs__tab" role="tab" type="button" id={`tab-${t.id}`} data-tab={t.id} aria-controls={`panel-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
+                  {t.label}
+                </button>
+              ))
+            }
+          </div>
+          {
+            install.map((t, i) => (
+              <div class="tabs__panel" role="tabpanel" id={`panel-${t.id}`} aria-labelledby={`tab-${t.id}`} hidden={i !== 0} tabindex="0">
+                <p>{t.text}</p>
+                {t.code && (t.code.includes('\n') ? <CodeBlock code={t.code} lang={t.lang} file={t.file} /> : <p><Command cmd={t.code} /></p>)}
+                {t.after && <p>{t.after}</p>}
+                {t.code2 && <CodeBlock code={t.code2} lang="bash" file="terminal" />}
+                {t.note && <p class="small muted">{t.note}</p>}
+                {t.links && (
+                  <p class="hero__actions" style="margin-top: var(--space-4)">
+                    {t.links.map((l) => (
+                      <a class="more-link" href={l.href}><span>{l.label}</span><Icon name="arrow-right" /></a>
+                    ))}
+                  </p>
+                )}
+              </div>
+            ))
+          }
+        </div>
+        <div class="shot-note">
+          <p class="label shot-eyebrow">Subsolvers</p>
+          <p class="body body-text measure">
+            SHOT needs a MIP solver for its dual strategy (<a class="link" href="https://www.ibm.com/products/ilog-cplex-optimization-studio">CPLEX</a>,
+            <a class="link" href="https://www.gurobi.com">Gurobi</a>, <a class="link" href="https://github.com/coin-or/Cbc">Cbc</a> or
+            <a class="link" href="https://highs.dev">HiGHS</a>) and an NLP solver for its primal strategy (<a class="link" href="https://github.com/coin-or/Ipopt">Ipopt</a>,
+            <a class="link" href="https://github.com/cvanaret/Uno">Uno</a>, or one in GAMS). A fully open-source setup works out of the box.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="step" aria-labelledby="use-title" id="use">
+      <div class="step__num" aria-hidden="true">02</div>
+      <div class="step__body">
+        <h2 class="title" id="use-title">Solve a problem</h2>
+        <div class="tabs" data-tabs data-tabs-key="usage">
+          <div class="tabs__list" role="tablist" aria-label="Interfaces">
+            {
+              usage.map((t, i) => (
+                <button class="tabs__tab" role="tab" type="button" id={`tab-${t.id}`} data-tab={t.id} aria-controls={`panel-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
+                  {t.label}
+                </button>
+              ))
+            }
+          </div>
+          {
+            usage.map((t, i) => (
+              <div class="tabs__panel" role="tabpanel" id={`panel-${t.id}`} aria-labelledby={`tab-${t.id}`} hidden={i !== 0} tabindex="0">
+                <CodeBlock code={t.code} lang={t.lang} file={t.file} />
+                <p>{t.text}</p>
+                <p><a class="more-link" href={t.link.href}><span>{t.link.label}</span><Icon name="arrow-right" /></a></p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="step" aria-labelledby="options-title" id="options">
+      <div class="step__num" aria-hidden="true">03</div>
+      <div class="step__body">
+        <h2 class="title" id="options-title">Set options</h2>
+        <p class="body body-text measure">
+          Any setting can be given on the command line as <code class="shot-inline-code">Name=value</code>, without spaces around
+          the <code class="shot-inline-code">=</code>. Names are case sensitive, and unknown names are ignored without an error.
+        </p>
+        <CodeBlock code="./SHOT problem.nl Termination.TimeLimit=100.0 Termination.ObjectiveGap.Relative=0.001" lang="bash" file="terminal" />
+        <p class="body body-text measure">
+          In SHOTpy and C++, use <code class="shot-inline-code">updateSetting</code> before <code class="shot-inline-code">setProblem</code>.
+          Settings can also be read from a file with <code class="shot-inline-code">--opt [file]</code> (GAMS style) or
+          <code class="shot-inline-code">--osol [file]</code> (OSoL); without a file name, SHOT writes a template. Common settings have shorthand flags:
+        </p>
+        <div class="table-wrap">
+          <table class="shot-table table--left body">
+            <thead><tr><th scope="col">Flag</th><th scope="col">Effect</th></tr></thead>
+            <tbody>
+              {flags.map(([f, d]) => <tr><td><code>{f}</code></td><td>{d}</td></tr>)}
+            </tbody>
+          </table>
+        </div>
+        <div class="shot-note">
+          <p class="label shot-eyebrow">All settings</p>
+          <p class="body body-text measure">
+            <code class="shot-inline-code">./SHOT --docs</code> writes <code class="shot-inline-code">options.md</code> with every setting, its type,
+            default value and description, generated from the build you run. It is the authoritative reference for your version.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="step" aria-labelledby="output-title" id="output">
+      <div class="step__num" aria-hidden="true">04</div>
+      <div class="step__body">
+        <h2 class="title" id="output-title">Read the results</h2>
+        <div class="shot-rows">
+          <div class="shot-rows__row"><p class="label">Console</p><p class="body">The dual and primal bounds and the objective gap in each iteration. Set the detail with <code class="shot-inline-code">Output.Console.LogLevel</code>, from 0 (trace) to 6 (off).</p></div>
+          <div class="shot-rows__row"><p class="label">Log</p><p class="body"><code class="shot-inline-code">SHOT.log</code> in the current directory, or <code class="shot-inline-code">--log file</code>.</p></div>
+          <div class="shot-rows__row"><p class="label">Solution</p><p class="body">Always in OSrL format, <code class="shot-inline-code">problem.osrl</code> or <code class="shot-inline-code">--osrl file</code>. Add <code class="shot-inline-code">--trc</code> for a GAMS trace file and <code class="shot-inline-code">--sol</code> for an AMPL solution file.</p></div>
+          <div class="shot-rows__row"><p class="label">Exit code</p><p class="body">0 when the run succeeded, whatever the model status; the status is in the result files.</p></div>
+        </div>
+        <p class="hero__actions">
+          <a class="more-link" href={`${docs}/CommandLineUsage.md`}><span>Command-line reference</span><Icon name="arrow-right" /></a>
+          <a class="more-link" href={`${docs}/DebuggingSHOT.md`}><span>Debugging SHOT</span><Icon name="arrow-right" /></a>
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>

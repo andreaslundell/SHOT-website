@@ -1,0 +1,55 @@
+---
+import Icon from './Icon.astro';
+import { repoUrl } from '../data/github';
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <img class="only-light" src="/images/logo/shot-logo.png" alt="SHOT" width="400" height="147" loading="lazy" />
+        <img class="only-dark" src="/images/logo/shot-logo-dark.png" alt="SHOT" width="400" height="147" loading="lazy" />
+        <p>The Supporting Hyperplane Optimization Toolkit: an open-source MINLP solver written in C++.</p>
+        <p>
+          A <a href="https://www.coin-or.org">COIN-OR</a> project, released under the
+          <a href="https://www.eclipse.org/legal/epl-2.0/">Eclipse Public License 2.0</a>.
+        </p>
+      </div>
+      <div>
+        <h2 class="label">Use SHOT</h2>
+        <ul>
+          <li><a href="/getting-started/">Get started</a></li>
+          <li><a href="/getting-started/#options">Options</a></li>
+          <li><a href={`${repoUrl}/blob/master/docs/SHOTpy_Tutorial.ipynb`}>SHOTpy tutorial</a></li>
+          <li><a href="https://pypi.org/project/SHOTpy/">SHOTpy on PyPI</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="label">Project</h2>
+        <ul>
+          <li><a href="/news/">News and releases</a></li>
+          <li><a href="/publications/">Publications</a></li>
+          <li><a href="/team/">Team and contributors</a></li>
+          <li><a href="/news/rss.xml"><span class="shot-iconlink__icon"><Icon name="rss" /></span> RSS</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="label">Contact</h2>
+        <ul>
+          <li><a href={repoUrl}><span class="shot-iconlink__icon"><Icon name="github" /></span> coin-or/SHOT</a></li>
+          <li><a href={`${repoUrl}/issues`}><span class="shot-iconlink__icon"><Icon name="file" /></span> Report an issue</a></li>
+          <li><a href="mailto:andreas.lundell@abo.fi"><span class="shot-iconlink__icon"><Icon name="paper-plane" /></span> Email</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__base">
+      <p>© {year} The SHOT developers</p>
+      <div class="theme-switch" role="group" aria-label="Colour theme" data-theme-switch>
+        <button type="button" data-theme-value="system" aria-pressed="true"><Icon name="theme" /> System</button>
+        <button type="button" data-theme-value="light" aria-pressed="false"><Icon name="sun" /> Light</button>
+        <button type="button" data-theme-value="dark" aria-pressed="false"><Icon name="moon" /> Dark</button>
+      </div>
+    </div>
+  </div>
+</footer>

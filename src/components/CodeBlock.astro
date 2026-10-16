@@ -1,0 +1,27 @@
+---
+// Brand code panel (dark in both themes) with a file label and a copy button.
+import { Code } from 'astro:components';
+import Icon from './Icon.astro';
+import theme from '../data/shot-code-theme.mjs';
+
+interface Props {
+  code: string;
+  lang: string;
+  file?: string;
+}
+const { code, lang, file } = Astro.props;
+const id = `code-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<figure class="codeblock">
+  <figcaption class="codeblock__head">
+    <span class="codeblock__file code">
+      <span class="shot-code__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      {file ?? lang}
+    </span>
+    <button class="copy-btn" type="button" data-copy-target={id} aria-label="Copy to clipboard">
+      <Icon name="copy" /> <span data-copy-label>Copy</span>
+    </button>
+  </figcaption>
+  <div id={id}><Code code={code.trim()} lang={lang as any} theme={theme as any} /></div>
+</figure>

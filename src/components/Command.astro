@@ -1,0 +1,13 @@
+---
+// Shell command pill with a copy button.
+import Icon from './Icon.astro';
+interface Props {
+  cmd: string;
+}
+const { cmd } = Astro.props;
+---
+
+<span class="cmd">
+  <span class="shot-cmd code">{cmd}</span>
+  <button class="copy-btn" type="button" data-copy={cmd} aria-label="Copy to clipboard"><Icon name="copy" /></button>
+</span>

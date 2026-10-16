@@ -1,0 +1,111 @@
+---
+import Icon from './Icon.astro';
+---
+
+<div class="esh" data-esh>
+  <figure class="esh__figure">
+    <div class="esh__frame">
+      <svg
+        data-esh-svg
+        viewBox="0 0 600 600"
+        role="img"
+        aria-label="The extended supporting hyperplane method on a two-variable problem: a convex feasible set inside a box, objective contours, the interior point, the MILP solution of the current outer approximation, and the supporting hyperplanes added so far."
+      >
+        <image href="/images/figures/esh-iteration.svg" x="0" y="0" width="600" height="600"></image>
+      </svg>
+    </div>
+    <figcaption class="small esh__caption" data-esh-caption aria-live="polite">
+      An illustration of one ESH iteration. With JavaScript enabled, you can step through the method here.
+    </figcaption>
+    <ul class="shot-legend small esh__legend">
+      <li><span class="shot-swatch shot-swatch--dot"></span>Interior point</li>
+      <li><span class="shot-swatch shot-swatch--open"></span>MILP solution</li>
+      <li><span class="shot-swatch shot-swatch--red"></span>Boundary point</li>
+      <li><span class="esh-swatch-ring"></span>Primal solution</li>
+      <li><span class="shot-swatch shot-swatch--line"></span>New hyperplane</li>
+      <li><span class="esh-swatch-old"></span>Earlier hyperplanes</li>
+      <li><span class="esh-swatch-col"></span>Integer values of x₁</li>
+      <li><span class="shot-swatch shot-swatch--blue"></span>Objective contours</li>
+    </ul>
+  </figure>
+
+  <div class="esh__panel">
+    <p class="label shot-eyebrow">Try it</p>
+    <p class="esh__problem code">
+      <span class="muted">minimize</span> <span data-esh-objective>−0.94x₁ + 0.34x₂</span><br />
+      <span class="muted">subject to</span> g₁(x) ≤ 0, g₂(x) ≤ 0<br />
+      <span class="muted">where</span> 0 ≤ x ≤ 10, x₁ integer
+    </p>
+    <dl class="esh__stats">
+      <div><dt class="label">Iteration</dt><dd data-esh-iter>0</dd></div>
+      <div><dt class="label">Dual bound</dt><dd data-esh-dual>−∞</dd></div>
+      <div><dt class="label">Primal bound</dt><dd data-esh-primal>∞</dd></div>
+      <div><dt class="label">Gap</dt><dd data-esh-gap>–</dd></div>
+    </dl>
+    <div class="esh__controls">
+      <button class="shot-btn shot-btn--primary shot-btn--sm" type="button" data-esh-step><Icon name="step" /> Next iteration</button>
+      <button class="shot-btn shot-btn--ghost shot-btn--sm" type="button" data-esh-play aria-pressed="false">
+        <span data-icon-play><Icon name="play" /></span><span data-icon-pause hidden><Icon name="pause" /></span>
+        <span data-play-label>Play</span>
+      </button>
+      <button class="shot-btn shot-btn--ghost shot-btn--sm" type="button" data-esh-reset><Icon name="reset" /> Reset</button>
+      <button class="shot-btn shot-btn--ghost shot-btn--sm" type="button" data-esh-new><Icon name="shuffle" /> New objective</button>
+    </div>
+    <div class="esh__log code" data-esh-log aria-label="Iteration log" tabindex="0"></div>
+    <p class="small muted">
+      Computed in your browser with the same steps as SHOT's dual and primal strategies, on a problem
+      small enough to draw. Termination at an objective gap of 0.01 %.
+    </p>
+  </div>
+</div>
+
+<style is:global>
+  .esh { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-7); align-items: start; }
+  @media (max-width: 960px) { .esh { grid-template-columns: minmax(0, 1fr); } }
+  .esh__figure { margin: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+  .esh__frame { background: var(--surface); border: var(--stroke-hairline) solid var(--figure-frame); padding: var(--space-3); }
+  .esh__frame svg { display: block; width: 100%; height: auto; }
+  .esh__caption { margin: 0; color: var(--ink-body); min-height: 63px; max-width: var(--measure); }
+  .esh__legend { margin-top: var(--space-1); }
+  .esh-swatch-ring { width: 12px; height: 12px; border-radius: var(--radius-full); box-shadow: inset 0 0 0 2px var(--shot-red); display: inline-block; }
+  .esh-swatch-old { width: 18px; height: 2px; background: var(--ink-muted); display: inline-block; }
+  .esh-swatch-col { width: 2px; height: 14px; background: var(--ink-muted); display: inline-block; opacity: .7; }
+
+  .esh-ground { fill: var(--figure-ground); }
+  .esh-poa { fill: var(--surface); }
+  .esh-contours line { stroke: var(--data-blue); stroke-width: 1.6; }
+  .esh-set { fill: var(--figure-set); stroke: var(--rule-strong); stroke-width: 1.6; stroke-linejoin: round; }
+  .esh-col { stroke: var(--lattice-dot); stroke-width: 1; stroke-dasharray: 2 5; stroke-linecap: round; }
+  .esh-col-in { stroke: var(--ink-muted); stroke-width: 1.2; stroke-opacity: .4; stroke-linecap: round; }
+  .esh-cut { stroke: var(--ink-muted); stroke-width: 1.4; stroke-linecap: round; transition: stroke .15s; }
+  .esh-cut--new { stroke: var(--shot-red); stroke-width: 3; }
+  .esh-box { fill: none; stroke: var(--rule-strong); stroke-width: 2; }
+  .esh-arrow line, .esh-arrow polyline { stroke: var(--data-blue); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .esh-search { stroke: var(--ink); stroke-width: 1.4; stroke-dasharray: 5 5; stroke-linecap: round; }
+  .esh-interior { fill: var(--ink); }
+  .esh-mip { fill: var(--surface); stroke: var(--ink); stroke-width: 2.5; }
+  .esh-boundary { fill: var(--shot-red); }
+  .esh-primal { fill: none; stroke: var(--shot-red); stroke-width: 2.5; }
+
+  .esh__panel { display: flex; flex-direction: column; gap: var(--space-5); min-width: 0; }
+  .esh__panel > * { margin: 0; }
+  .esh__problem { color: var(--ink); background: var(--surface-raised); padding: var(--space-4) var(--space-5); line-height: 26px; }
+  .esh__stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--space-5); margin: 0; border-bottom: var(--stroke-hairline) solid var(--rule); }
+  .esh__stats div { padding: var(--space-3) 0; border-top: var(--stroke-hairline) solid var(--rule); }
+  .esh__stats dt { color: var(--accent-text); text-transform: uppercase; }
+  .esh__stats dd { margin: var(--space-1) 0 0; font-family: var(--font-display); font-size: 24px; line-height: 30px; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .esh__controls { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .esh__controls [hidden] { display: none; }
+  .esh__log { background: var(--code-bg); color: var(--code-fg); border-radius: var(--radius-md); padding: var(--space-4); font-size: 12px; line-height: 19px; height: 228px; overflow: auto; white-space: pre; }
+  .esh__log .is-head { color: var(--code-comment); border-bottom: 1px solid var(--code-border); padding-bottom: var(--space-2); margin-bottom: var(--space-2); }
+  .esh__log .is-new { color: var(--code-string); }
+  .esh__log .is-end { color: var(--code-keyword); margin-top: var(--space-2); }
+  [data-theme="dark"] .esh__log { background: var(--shot-ink-soft); box-shadow: inset 0 0 0 1px var(--code-border); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .esh__log { background: var(--shot-ink-soft); box-shadow: inset 0 0 0 1px var(--code-border); } }
+  .esh:not([data-ready]) .esh__controls, .esh:not([data-ready]) .esh__log, .esh:not([data-ready]) .esh__stats { display: none; }
+</style>
+
+<script>
+  import { mountEshDemo } from '../scripts/esh-demo';
+  for (const el of document.querySelectorAll<HTMLElement>('[data-esh]')) mountEshDemo(el);
+</script>
