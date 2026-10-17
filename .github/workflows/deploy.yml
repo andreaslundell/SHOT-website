@@ -35,6 +35,28 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
           SITE_URL: ${{ steps.pages.outputs.origin }}
+      # Keep docs source beside solver code; the website owns the combined deployment.
+      - uses: actions/checkout@v4
+        with:
+          repository: coin-or/SHOT
+          ref: master
+          path: shot-source
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install documentation build dependencies
+        run: sudo apt-get update && sudo apt-get install -y doxygen coinor-libipopt-dev libopenblas-dev ninja-build
+      - name: Install documentation tools
+        run: python -m pip install -r shot-source/docs/requirements.txt
+      - name: Compile and install matching SHOTpy
+        timeout-minutes: 45
+        env:
+          CMAKE_BUILD_PARALLEL_LEVEL: '2'
+        # Stream compiler progress so the native build does not appear stalled.
+        run: python -m pip install --verbose ./shot-source --config-settings=cmake.define.HAS_CBC=off
+      - name: Build development documentation
+        run: python shot-source/docs/build.py --source-ref "$(git -C shot-source rev-parse HEAD)" --output dist/docs/dev
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

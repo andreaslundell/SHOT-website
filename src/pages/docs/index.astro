@@ -1,0 +1,44 @@
+---
+import Base from '../../layouts/Base.astro';
+import Heading from '../../components/Heading.astro';
+const guides = [
+  { label: 'Python', title: 'Build your first model', href: '/docs/dev/getting-started.html', text: 'Define variables, constraints and an objective with SHOTpy.' },
+  { label: 'Command line', title: 'Solve a problem file', href: '/docs/dev/CommandLineUsage.html', text: 'Run SHOT, choose options and inspect solver output.' },
+  { label: 'C++', title: 'Integrate SHOT', href: '/docs/dev/cpp.html', text: 'Embed the solver and use callbacks in your application.' },
+  { label: 'Reference', title: 'Find a solver setting', href: '/docs/dev/reference/settings.html', text: 'Look up settings, allowed values and build-specific defaults.' },
+];
+---
+<Base title="Documentation" description="SHOT user guides and Python and C++ API references.">
+  <main class="wrap docs-landing">
+    <Heading eyebrow="SHOT 2.0 · Development" level={1} size="display">
+      Documentation
+      <Fragment slot="lead">From your first model to the solver API.</Fragment>
+    </Heading>
+    <p class="body docs-intro">Installation, worked examples and reference material for SHOT and SHOTpy. These guides follow development towards SHOT 2.0; interfaces and behavior may change before release.</p>
+    <a class="shot-btn shot-btn--accent" href="/docs/dev/">Read the documentation</a>
+    <section class="docs-guides" aria-label="Choose your starting point">
+      {guides.map((guide) => (
+        <div class="docs-guide">
+          <p class="label shot-eyebrow">{guide.label}</p>
+          <h2 class="heading"><a href={guide.href}>{guide.title}</a></h2>
+          <p class="body">{guide.text}</p>
+        </div>
+      ))}
+    </section>
+    <section class="shot-note">
+      <p class="label shot-eyebrow">API reference</p>
+      <p class="body"><a href="/docs/dev/reference/python.html">SHOTpy</a> and <a href="/docs/dev/reference/cpp.html">C++</a> references are generated alongside the guides.</p>
+    </section>
+  </main>
+</Base>
+<style>
+.docs-landing { padding-top:var(--space-8); padding-bottom:var(--space-9); }
+.docs-intro { max-width:var(--measure); margin:var(--space-5) 0; color:var(--ink-body); }
+.docs-guides { margin:var(--space-8) 0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-7) var(--space-8); }
+.docs-guide { border-top:var(--stroke-hairline) solid var(--rule); padding-top:var(--space-5); }
+.docs-guide h2 { margin:var(--space-3) 0; }
+.docs-guide p { margin:0; }
+.docs-guide .body { color:var(--ink-body); max-width:var(--measure); }
+.docs-guide a, .shot-note a { color:var(--ink); text-decoration:underline; text-decoration-color:var(--shot-red); text-underline-offset:4px; }
+@media(max-width:640px) { .docs-guides { grid-template-columns:1fr; } .docs-landing :global(.display) { font-size:40px; line-height:44px; } }
+</style>
