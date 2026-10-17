@@ -53,3 +53,18 @@ Use `datePrecision: month` when only the month is known. The newest three items 
 `.github/workflows/deploy.yml` builds and deploys on every push to `main`, and weekly to refresh the contributor list. In the repository settings, under Pages, set the source to GitHub Actions and the custom domain to `www.shotsolver.dev`; `public/CNAME` holds the same domain.
 
 The old GitBook URLs under `/shot/` (linked from the SHOT repository, PyPI and the solver's output) redirect to the new pages; see `redirects` in `astro.config.mjs`.
+
+## Documentation
+
+The `/docs/` page links to Sphinx documentation built from `coin-or/SHOT` under
+`/docs/dev/`. The deployment workflow builds SHOTpy from the same checkout used for
+the guides and API references. Merge the documentation tooling into SHOT before
+publishing this workflow. Development builds use HiGHS and Ipopt; backend-dependent
+defaults can differ from other installations.
+
+For a local combined preview, build Astro first, then run the SHOT checkout's
+`docs/build.py --output /absolute/path/to/SHOT-website/dist/docs/dev` using its
+matching SHOTpy environment. Serve `dist/` with a static HTTP server.
+
+Release documentation must use a fixed tag and be included in each deployment;
+GitHub Pages replaces the whole site. Add released versions to `src/pages/docs/index.astro`.
