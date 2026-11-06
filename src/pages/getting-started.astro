@@ -4,9 +4,8 @@ import Heading from '../components/Heading.astro';
 import Icon from '../components/Icon.astro';
 import Command from '../components/Command.astro';
 import CodeBlock from '../components/CodeBlock.astro';
-import { repoUrl } from '../data/github';
 
-const docs = `${repoUrl}/blob/master/docs`;
+const docs = 'https://www.shotsolver.dev/docs/dev';
 
 // Plain text with `backticks` for inline code.
 const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -67,7 +66,7 @@ cmake --build build --parallel`,
     file: 'terminal',
     after: '`CBC_DIR` and `IPOPT_DIR` give the locations of Cbc and Ipopt, if CMake does not find them itself. To use an installed HiGHS instead of the submodule, add `-DUSE_EXTERNAL_HIGHS=on` and `-DHIGHS_EXTERNAL_DIR=/path/to/highs`. This builds the `SHOT` executable and the `libSHOTSolver` library in `build/`; add `-DHAS_PYTHON=on` to also build SHOTpy. Check the CMake output for lines saying that a solver was not found; such a solver is left out of the build.',
     note: 'SHOT reads AMPL (`.nl`) and OSiL (`.osil`) files out of the box. Reading GAMS (`.gms`) files requires SHOT to be compiled with a GAMS installation.',
-    links: [{ href: `${docs}/CompilationInstructions.md`, label: 'Full compilation instructions' }],
+    links: [{ href: `${docs}/CompilationInstructions.html`, label: 'Full compilation instructions' }],
   },
 ];
 
@@ -96,7 +95,7 @@ print(solver.getModelReturnStatus())
 if solver.hasPrimalSolution():
     print(solver.getPrimalSolution().point)`,
     text: 'Build the problem with the API, or read it from a file with `solver.setProblem("problem.nl")`, which also accepts `.gms` and `.osil` files. The tutorial notebook covers nonlinear expressions, settings and callbacks.',
-    link: { href: `${docs}/SHOTpy_Tutorial.ipynb`, label: 'SHOTpy tutorial' },
+    link: { href: `${docs}/SHOTpy_Tutorial.html`, label: 'SHOTpy tutorial' },
   },
   {
     id: 'gamspy',
@@ -183,7 +182,7 @@ optimize!(model)`,
 ./SHOT problem.gms --mip=highs      # GAMS
 ./SHOT --help                       # what this build supports`,
     text: 'SHOT prints the dual and primal bounds as it iterates, and writes the solution in OSrL format and a log to `SHOT.log`.',
-    link: { href: `${docs}/CommandLineUsage.md`, label: 'Command-line reference' },
+    link: { href: `${docs}/CommandLineUsage.html`, label: 'Command-line reference' },
   },
   {
     id: 'cpp',
@@ -201,7 +200,7 @@ if(solver->setProblem("problem.osil") && solver->solveProblem())
     double dual = solver->getCurrentDualBound();
 }`,
     text: 'Link against `libSHOTSolver` to embed SHOT in other software; the console application is a thin wrapper around this API. Callbacks are registered with `registerCallback`.',
-    link: { href: `${docs}/Callbacks.md`, label: 'Callbacks' },
+    link: { href: `${docs}/Callbacks.html`, label: 'Callbacks' },
   },
 ];
 
@@ -326,7 +325,7 @@ const flags: [string, string][] = [
           <p class="body body-text measure">
             <code class="shot-inline-code">./SHOT --docs</code> writes <code class="shot-inline-code">options.md</code> with every setting, its type,
             default value and description, generated from the build you run. It is the authoritative reference for your version.
-            See the <a class="link" href={`${docs}/Configuration.md`}>configuration guide</a> for settings precedence, tolerances and logging recipes.
+            See the <a class="link" href={`${docs}/Configuration.html`}>configuration guide</a> for settings precedence, tolerances and logging recipes.
           </p>
         </div>
       </div>
@@ -358,10 +357,10 @@ const flags: [string, string][] = [
           use the final report's global bound when reporting results. Check that a primal solution exists before reading its values.
         </p>
         <p class="hero__actions">
-          <a class="more-link" href={`${docs}/UnderstandingOutput.md`}><span>Understand solver output</span><Icon name="arrow-right" /></a>
-          <a class="more-link" href={`${docs}/site/concepts.md`}><span>Results and status</span><Icon name="arrow-right" /></a>
-          <a class="more-link" href={`${docs}/CommandLineUsage.md`}><span>Command-line reference</span><Icon name="arrow-right" /></a>
-          <a class="more-link" href={`${docs}/DebuggingSHOT.md`}><span>Debugging SHOT</span><Icon name="arrow-right" /></a>
+          <a class="more-link" href={`${docs}/UnderstandingOutput.html`}><span>Understand solver output</span><Icon name="arrow-right" /></a>
+          <a class="more-link" href={`${docs}/concepts.html`}><span>Results and status</span><Icon name="arrow-right" /></a>
+          <a class="more-link" href={`${docs}/CommandLineUsage.html`}><span>Command-line reference</span><Icon name="arrow-right" /></a>
+          <a class="more-link" href={`${docs}/DebuggingSHOT.html`}><span>Debugging SHOT</span><Icon name="arrow-right" /></a>
         </p>
       </div>
     </section>
