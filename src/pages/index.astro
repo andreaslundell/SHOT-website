@@ -79,7 +79,7 @@ const capability: [string, Mark[]][] = [
       <div class="shot-rows">
         <div class="shot-rows__row"><p class="label">Problems</p><p class="body">MINLP and its subclasses: NLP, MIQP and MIQCQP</p></div>
         <div class="shot-rows__row"><p class="label">Method</p><p class="body">Polyhedral outer approximation (ESH and ECP) combined with primal heuristics</p></div>
-        <div class="shot-rows__row"><p class="label">Subsolvers</p><p class="body">MIP: CPLEX, Gurobi, Cbc or HiGHS. NLP: Ipopt, Uno, or any NLP solver in GAMS</p></div>
+        <div class="shot-rows__row"><p class="label">Subsolvers</p><p class="body">MIP: CPLEX, Gurobi, Cbc or HiGHS. NLP: Ipopt, Uno, CONOPT, SHOT itself, or any NLP solver in GAMS</p></div>
         <div class="shot-rows__row"><p class="label">Interfaces</p><p class="body">GAMSPy, GAMS, Python (SHOTpy), C++, the command line, and AMPL, Pyomo and JuMP through ASL</p></div>
         <div class="shot-rows__row"><p class="label">Problem formats</p><p class="body">OSiL, AMPL <code class="shot-inline-code">.nl</code> and GAMS <code class="shot-inline-code">.gms</code></p></div>
         <div class="shot-rows__row"><p class="label">Community</p><p class="body">A <a class="link" href="https://www.coin-or.org">COIN-OR</a> project, winner of the COIN-OR Cup 2018, licensed under EPL-2.0</p></div>
@@ -93,7 +93,7 @@ const capability: [string, Mark[]][] = [
         <Heading eyebrow="02 — Method" id="method-title">
           Dual and primal strategies
           <Fragment slot="lead">
-            The outer approximation gives a lower bound on the objective, feasible solutions an upper bound. SHOT terminates when the gap
+            For minimization of a convex model, the outer approximation gives a lower bound on the objective and feasible solutions an upper bound. The directions reverse for maximization. SHOT terminates when the gap
             between them is within tolerance.
           </Fragment>
         </Heading>
@@ -105,7 +105,7 @@ const capability: [string, Mark[]][] = [
           <h3 class="heading">Polyhedral outer approximation</h3>
           <ul class="shot-list body">
             <li>Supporting hyperplanes (ESH) or cutting planes (ECP) build an outer approximation of the nonlinear feasible set.</li>
-            <li>The MIP subsolver (CPLEX, Gurobi, Cbc or HiGHS) gives the dual bound, the minimum within the approximation.</li>
+            <li>The MIP subsolver (CPLEX, Gurobi, Cbc or HiGHS) supplies a dual bound from the approximation, even when a subproblem solve stops before optimality.</li>
             <li>Multi-tree with every MIP subsolver. With CPLEX and Gurobi, also single-tree (branch and cut), and quadratic terms can be passed directly to MIQP and MIQCQP subproblems.</li>
           </ul>
         </article>
@@ -114,7 +114,7 @@ const capability: [string, Mark[]][] = [
           <h3 class="heading">Deterministic heuristics</h3>
           <ul class="shot-list body">
             <li>Checking the solutions in the MIP solver's solution pool against the nonlinear constraints.</li>
-            <li>Solving NLP problems with the integer variables fixed, with Ipopt, Uno, GAMS or SHOT itself.</li>
+            <li>Solving NLP problems with the integer variables fixed, with Ipopt, Uno, CONOPT, GAMS or SHOT itself.</li>
             <li>Root searches between infeasible and feasible points.</li>
           </ul>
         </article>

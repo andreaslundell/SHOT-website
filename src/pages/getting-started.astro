@@ -16,15 +16,21 @@ const install = [
   {
     id: 'pip',
     label: 'Python',
-    text: 'The SHOTpy wheels include SHOT with the open-source subsolvers Cbc, Ipopt and HiGHS, and need Python 3.11 or later. They are built for Linux (x86-64) and macOS (Apple silicon, macOS 14 and later). On other Linux and macOS systems, pip builds SHOT from source, which needs the compiler and dependencies in the compilation instructions. Windows is not supported; use the Windows Subsystem for Linux.',
+    text: 'The SHOTpy wheels include SHOT with the open-source subsolvers Cbc, Ipopt and HiGHS, and need Python 3.11 or later. They are built for Linux (x86-64 and ARM64), macOS (Apple silicon, macOS 14 and later), and Windows x64. The package also installs the SHOT command. On platforms without a matching wheel, building from source needs the compiler and dependencies in the compilation instructions.',
     code: 'pip install SHOTpy',
     lang: 'bash',
     file: 'terminal',
-    after: 'Public wheels cannot include CPLEX, Gurobi or GAMS. If one of them is installed and licensed on your computer, build SHOTpy from source with it:',
+    after: 'The public wheels do not include CPLEX, Gurobi, GAMS or CONOPT. If one of them is installed and licensed on your computer, build SHOTpy from source with it:',
     code2: `pip install SHOTpy --no-binary SHOTpy \\
     --config-settings=cmake.define.HAS_GUROBI=on \\
-    --config-settings=cmake.define.GUROBI_DIR=/opt/gurobi1103/linux64`,
+    --config-settings=cmake.define.GUROBI_DIR=/path/to/gurobi`,
     note: 'Use the same pattern with `HAS_CPLEX` and `CPLEX_DIR`, or `HAS_GAMS` and `GAMS_DIR`.',
+  },
+  {
+    id: 'binary',
+    label: 'Standalone executable',
+    text: 'Download the executable archive for Linux x86-64 or ARM64, macOS ARM64, or Windows x64 from GitHub releases. It includes the same open-source solvers as SHOTpy and needs no Python installation. Extract the whole archive and keep its files together. Run `./SHOT` on Linux/macOS or `SHOT.exe` on Windows.',
+    links: [{ href: 'https://github.com/coin-or/SHOT/releases', label: 'Executable downloads and checksums' }],
   },
   {
     id: 'gams',
@@ -48,7 +54,7 @@ gamspy install solver shot`,
   {
     id: 'source',
     label: 'From source',
-    text: 'SHOT compiles on Linux and macOS with CMake and a C++17 compiler; on Windows, use the Windows Subsystem for Linux. It needs a MIP solver and an NLP solver; the open-source Cbc, HiGHS and Ipopt are enough. HiGHS is compiled from its submodule by default.',
+    text: 'SHOT compiles on Linux and macOS with CMake and a C++17 compiler, and natively on Windows x64 with MSVC. WSL remains an alternative. It needs a MIP solver; primal NLP searches can use an external NLP solver or SHOT itself. The open-source Cbc, HiGHS and Ipopt provide a complete setup. HiGHS is compiled from its submodule by default.',
     code: `git clone https://github.com/coin-or/SHOT.git
 cd SHOT
 git submodule update --init --recursive
@@ -86,7 +92,9 @@ problem.finalize()
 solver.setProblem(problem)
 solver.solveProblem()
 
-print(solver.getModelReturnStatus(), solver.getPrimalSolution().point)`,
+print(solver.getModelReturnStatus())
+if solver.hasPrimalSolution():
+    print(solver.getPrimalSolution().point)`,
     text: 'Build the problem with the API, or read it from a file with `solver.setProblem("problem.nl")`, which also accepts `.gms` and `.osil` files. The tutorial notebook covers nonlinear expressions, settings and callbacks.',
     link: { href: `${docs}/SHOTpy_Tutorial.ipynb`, label: 'SHOTpy tutorial' },
   },
@@ -200,7 +208,7 @@ if(solver->setProblem("problem.osil") && solver->solveProblem())
 const flags: [string, string][] = [
   ['--convex', 'Assume that the problem is convex'],
   ['--mip=<cbc|highs|cplex|gurobi>', 'Select the MIP solver of the dual strategy'],
-  ['--nlp=<ipopt|gams|shot|uno>', 'Select the NLP solver of the primal strategy'],
+  ['--nlp=<ipopt|gams|shot|uno|conopt>', 'Select the NLP solver of the primal strategy'],
   ['--tree=<single|multi>', 'Single-tree (branch and cut, CPLEX and Gurobi) or multi-tree strategy'],
   ['--threads=<n>', 'Maximum number of threads'],
   ['--absgap=<value>', 'Absolute objective gap tolerance'],
@@ -228,7 +236,7 @@ const flags: [string, string][] = [
             {
               install.map((t, i) => (
                 <button class="tabs__tab" role="tab" type="button" id={`tab-${t.id}`} data-tab={t.id} aria-controls={`panel-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
-                  {t.label}
+                  <span id={t.id}>{t.label}</span>
                 </button>
               ))
             }
@@ -258,7 +266,7 @@ const flags: [string, string][] = [
             SHOT needs a MIP solver for its dual strategy (<a class="link" href="https://www.ibm.com/products/ilog-cplex-optimization-studio">CPLEX</a>,
             <a class="link" href="https://www.gurobi.com">Gurobi</a>, <a class="link" href="https://github.com/coin-or/Cbc">Cbc</a> or
             <a class="link" href="https://highs.dev">HiGHS</a>) and an NLP solver for its primal strategy (<a class="link" href="https://github.com/coin-or/Ipopt">Ipopt</a>,
-            <a class="link" href="https://github.com/cvanaret/Uno">Uno</a>, or one in GAMS). A fully open-source setup works out of the box.
+            <a class="link" href="https://github.com/cvanaret/Uno">Uno</a>, CONOPT, SHOT itself, or one in GAMS). A fully open-source setup works out of the box.
           </p>
         </div>
       </div>
@@ -273,7 +281,7 @@ const flags: [string, string][] = [
             {
               usage.map((t, i) => (
                 <button class="tabs__tab" role="tab" type="button" id={`tab-${t.id}`} data-tab={t.id} aria-controls={`panel-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
-                  {t.label}
+                  <span id={t.id}>{t.label}</span>
                 </button>
               ))
             }
@@ -303,7 +311,7 @@ const flags: [string, string][] = [
         <p class="body body-text measure">
           In SHOTpy and C++, use <code class="shot-inline-code">updateSetting</code> before <code class="shot-inline-code">setProblem</code>.
           Settings can also be read from a file with <code class="shot-inline-code">--opt [file]</code> (GAMS style) or
-          <code class="shot-inline-code">--osol [file]</code> (OSoL); without a file name, SHOT writes a template. Common settings have shorthand flags:
+          <code class="shot-inline-code">--osol [file]</code> (OSoL); without a file name, SHOT reads the default file if it exists, otherwise it writes a template. Common settings have shorthand flags:
         </p>
         <div class="table-wrap">
           <table class="shot-table table--left body">
@@ -318,6 +326,7 @@ const flags: [string, string][] = [
           <p class="body body-text measure">
             <code class="shot-inline-code">./SHOT --docs</code> writes <code class="shot-inline-code">options.md</code> with every setting, its type,
             default value and description, generated from the build you run. It is the authoritative reference for your version.
+            See the <a class="link" href={`${docs}/Configuration.md`}>configuration guide</a> for settings precedence, tolerances and logging recipes.
           </p>
         </div>
       </div>
@@ -328,12 +337,29 @@ const flags: [string, string][] = [
       <div class="step__body">
         <h2 class="title" id="output-title">Read the results</h2>
         <div class="shot-rows">
-          <div class="shot-rows__row"><p class="label">Console</p><p class="body">The dual and primal bounds and the objective gap in each iteration. Set the detail with <code class="shot-inline-code">Output.Console.LogLevel</code>, from 0 (trace) to 6 (off).</p></div>
+          <div class="shot-rows__row"><p class="label">Console</p><p class="body">Preparation statistics, selected progress rows, and a final solution report. Set <code class="shot-inline-code">Output.Console.Iteration.Detail=0</code> for all progress rows. <code class="shot-inline-code">Output.Console.LogLevel</code> independently controls message severity, from 0 (trace) to 6 (off).</p></div>
           <div class="shot-rows__row"><p class="label">Log</p><p class="body"><code class="shot-inline-code">SHOT.log</code> in the current directory, or <code class="shot-inline-code">--log file</code>.</p></div>
           <div class="shot-rows__row"><p class="label">Solution</p><p class="body">Always in OSrL format, <code class="shot-inline-code">problem.osrl</code> or <code class="shot-inline-code">--osrl file</code>. Add <code class="shot-inline-code">--trc</code> for a GAMS trace file and <code class="shot-inline-code">--sol</code> for an AMPL solution file.</p></div>
           <div class="shot-rows__row"><p class="label">Exit code</p><p class="body">0 when the run succeeded, whatever the model status; the status is in the result files.</p></div>
         </div>
+        <p class="body body-text measure" style="margin-top: var(--space-5)">
+          For minimization, the dual bound is a lower bound and the best feasible objective is an upper bound;
+          for maximization the directions reverse. A relative gap of <code class="shot-inline-code">0.001</code> means 0.1%.
+          An iteration label such as <code class="shot-inline-code">MILP-O</code> describes a subproblem.
+          Read the final model status to see whether the original problem was solved to global optimality.
+        </p>
+        <CodeBlock code={`#: type        time     cuts + / total     dual / primal     abs. / rel. gap     current obj. / error
+6: MILP-SL1    0.17       2 / 12        0.716245 / 14.9066     14.2 / 0.95         7.92975 / 0.592
+1: NLPSOLPT-R  0.19       2 / 12        0.716245 / 10           9.3 / 0.93         10 / 9.61e-9`} lang="text" file="selected rows · spacing and values simplified" />
+        <p class="body body-text measure">
+          Here the MIP solve reaches a solution limit, then a fixed-integer NLP call improves the feasible objective to 10.
+          The NLP counter starts at one. Its final <code class="shot-inline-code">R</code> means the reformulated model.
+          A <code class="shot-inline-code">*</code> beside a dual bound means it is a working bound without a global guarantee;
+          use the final report's global bound when reporting results. Check that a primal solution exists before reading its values.
+        </p>
         <p class="hero__actions">
+          <a class="more-link" href={`${docs}/UnderstandingOutput.md`}><span>Understand solver output</span><Icon name="arrow-right" /></a>
+          <a class="more-link" href={`${docs}/site/concepts.md`}><span>Results and status</span><Icon name="arrow-right" /></a>
           <a class="more-link" href={`${docs}/CommandLineUsage.md`}><span>Command-line reference</span><Icon name="arrow-right" /></a>
           <a class="more-link" href={`${docs}/DebuggingSHOT.md`}><span>Debugging SHOT</span><Icon name="arrow-right" /></a>
         </p>
