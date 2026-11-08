@@ -1,14 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Heading from '../../components/Heading.astro';
-import { repoUrl } from '../../data/github';
-const docs = `${repoUrl}/blob/master/docs`;
 const guides = [
   { label: 'Python', title: 'Build your first model', href: '/docs/dev/getting-started.html', text: 'Define variables, constraints and an objective with SHOTpy.' },
   { label: 'Command line', title: 'Solve a problem file', href: '/docs/dev/CommandLineUsage.html', text: 'Run SHOT, choose options and write result files.' },
-  { label: 'Results', title: 'Understand solver output', href: `${docs}/UnderstandingOutput.md`, text: 'Decode solve stages, iteration rows, bounds, gaps and final statuses.' },
-  { label: 'Configuration', title: 'Configure a solve', href: `${docs}/Configuration.md`, text: 'Choose subsolvers, understand settings precedence and set limits and tolerances.' },
-  { label: 'Modeling', title: 'Prepare a model', href: `${docs}/Modeling.md`, text: 'Set useful bounds, respect expression domains and understand reformulation.' },
+  { label: 'Results', title: 'Understand solver output', href: '/docs/dev/UnderstandingOutput.html', text: 'Decode solve stages, iteration rows, bounds, gaps and final statuses.' },
+  { label: 'Configuration', title: 'Configure a solve', href: '/docs/dev/Configuration.html', text: 'Choose subsolvers, understand settings precedence and set limits and tolerances.' },
+  { label: 'Modeling', title: 'Prepare a model', href: '/docs/dev/Modeling.html', text: 'Set useful bounds, respect expression domains and understand reformulation.' },
   { label: 'C++', title: 'Integrate SHOT', href: '/docs/dev/cpp.html', text: 'Embed the solver and use callbacks in your application.' },
   { label: 'Reference', title: 'Find a solver setting', href: '/docs/dev/reference/settings.html', text: 'Look up settings, allowed values and build-specific defaults.' },
 ];
