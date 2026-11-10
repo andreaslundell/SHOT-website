@@ -62,5 +62,6 @@ export default defineConfig({
     '/shot/news': '/news/',
     '/shot/using-shot/getting-started': '/getting-started/',
     '/shot/using-shot/solver-options': '/getting-started/#options',
+    '/news/2026-10-shot-2-0': '/news/2026-11-shot-2-0/',
   },
 });

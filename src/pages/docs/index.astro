@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Heading from '../../components/Heading.astro';
 const guides = [
   { label: 'Python', title: 'Build your first model', href: '/docs/dev/getting-started.html', text: 'Define variables, constraints and an objective with SHOTpy.' },
+  { label: 'Tutorial', title: 'Work through the notebooks', href: '/docs/dev/SHOTpy_Tutorial.html', text: 'Four SHOTpy notebooks, from your first model to callbacks and advanced modeling.' },
   { label: 'Command line', title: 'Solve a problem file', href: '/docs/dev/CommandLineUsage.html', text: 'Run SHOT, choose options and write result files.' },
   { label: 'Results', title: 'Understand solver output', href: '/docs/dev/UnderstandingOutput.html', text: 'Decode solve stages, iteration rows, bounds, gaps and final statuses.' },
   { label: 'Configuration', title: 'Configure a solve', href: '/docs/dev/Configuration.html', text: 'Choose subsolvers, understand settings precedence and set limits and tolerances.' },
@@ -13,11 +14,11 @@ const guides = [
 ---
 <Base title="Documentation" description="SHOT user guides and Python and C++ API references.">
   <main class="wrap docs-landing">
-    <Heading eyebrow="SHOT 2.0 · Development" level={1} size="display">
+    <Heading eyebrow="SHOT 2.0" level={1} size="display">
       Documentation
       <Fragment slot="lead">From your first model to the solver API.</Fragment>
     </Heading>
-    <p class="body docs-intro">Installation, worked examples and reference material for SHOT and SHOTpy. These guides follow development towards SHOT 2.0; interfaces and behavior may change before release.</p>
+    <p class="body docs-intro">Installation, worked examples and reference material for SHOT and SHOTpy. The guides cover SHOT 2.0.</p>
     <a class="shot-btn shot-btn--accent" href="/docs/dev/">Read the documentation</a>
     <section class="docs-guides" aria-label="Choose your starting point">
       {guides.map((guide) => (

@@ -15,7 +15,7 @@ const install = [
   {
     id: 'pip',
     label: 'Python',
-    text: 'The SHOTpy wheels include SHOT with the open-source subsolvers Cbc, Ipopt and HiGHS, and need Python 3.11 or later. They are built for Linux (x86-64 and ARM64), macOS (Apple silicon, macOS 14 and later), and Windows x64. The package also installs the SHOT command. On platforms without a matching wheel, building from source needs the compiler and dependencies in the compilation instructions.',
+    text: 'The SHOTpy wheels include SHOT with the open-source subsolvers Cbc, Ipopt and HiGHS, and need Python 3.11 or later. They are built for Linux (x86-64 and ARM64), macOS (Apple silicon, macOS 15 and later), and Windows x64. The package also installs the SHOT command. On platforms without a matching wheel, building from source needs the compiler and dependencies in the compilation instructions.',
     code: 'pip install SHOTpy',
     lang: 'bash',
     file: 'terminal',
@@ -94,7 +94,7 @@ solver.solveProblem()
 print(solver.getModelReturnStatus())
 if solver.hasPrimalSolution():
     print(solver.getPrimalSolution().point)`,
-    text: 'Build the problem with the API, or read it from a file with `solver.setProblem("problem.nl")`, which also accepts `.gms` and `.osil` files. The tutorial notebook covers nonlinear expressions, settings and callbacks.',
+    text: 'Build the problem with the API, or read it from a file with `solver.setProblem("problem.nl")`, which also accepts `.gms` and `.osil` files. The tutorial notebooks cover nonlinear expressions, settings, callbacks and larger workflows.',
     link: { href: `${docs}/SHOTpy_Tutorial.html`, label: 'SHOTpy tutorial' },
   },
   {

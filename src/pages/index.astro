@@ -173,7 +173,7 @@ const capability: [string, Mark[]][] = [
     <div class="wrap band__inner">
       <div class="band__copy">
         <header class="shot-heading">
-          <p class="label shot-eyebrow">New version</p>
+          <p class="label shot-eyebrow">Released November 2026</p>
           <h2 class="title" id="v2-title">What's new in <span class="shot-hl">SHOT 2.0</span></h2>
           <p class="lead">A Python interface, HiGHS as MIP subsolver, and callbacks that let you take part in the solution process.</p>
         </header>
@@ -182,7 +182,7 @@ const capability: [string, Mark[]][] = [
           <li><span class="band__mark" aria-hidden="true"></span><span>HiGHS as MIP subsolver<small>A fully open-source toolchain with Cbc, HiGHS and Ipopt</small></span></li>
           <li><span class="band__mark" aria-hidden="true"></span><span>Extended callbacks<small>Inject solutions, cuts, dual bounds and interior points</small></span></li>
           <li><span class="band__mark" aria-hidden="true"></span><span>Decomposition of convex quadratics<small>Eigenvalue and LDLᵀ lifting reformulations</small></span></li>
-          <li><span class="band__mark" aria-hidden="true"></span><span>Better nonconvex handling<small>Convex bounding and repair of infeasible subproblems</small></span></li>
+          <li><span class="band__mark" aria-hidden="true"></span><span>Better nonconvex handling<small>Quadratics passed to the MIP solver and more reliable infeasibility repair</small></span></li>
         </ul>
         <div class="hero__actions" style="margin-top: var(--space-6)">
           {latestRelease && <a class="shot-btn shot-btn--ghost" href={newsUrl(latestRelease)}>Read the announcement</a>}
