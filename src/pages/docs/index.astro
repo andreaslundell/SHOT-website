@@ -1,15 +1,17 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Heading from '../../components/Heading.astro';
+// Released documentation; the development version of master is under /docs/dev/.
+const docs = '/docs/2.0';
 const guides = [
-  { label: 'Python', title: 'Build your first model', href: '/docs/dev/getting-started.html', text: 'Define variables, constraints and an objective with SHOTpy.' },
-  { label: 'Tutorial', title: 'Work through the notebooks', href: '/docs/dev/SHOTpy_Tutorial.html', text: 'Four SHOTpy notebooks, from your first model to callbacks and advanced modeling.' },
-  { label: 'Command line', title: 'Solve a problem file', href: '/docs/dev/CommandLineUsage.html', text: 'Run SHOT, choose options and write result files.' },
-  { label: 'Results', title: 'Understand solver output', href: '/docs/dev/UnderstandingOutput.html', text: 'Decode solve stages, iteration rows, bounds, gaps and final statuses.' },
-  { label: 'Configuration', title: 'Configure a solve', href: '/docs/dev/Configuration.html', text: 'Choose subsolvers, understand settings precedence and set limits and tolerances.' },
-  { label: 'Modeling', title: 'Prepare a model', href: '/docs/dev/Modeling.html', text: 'Set useful bounds, respect expression domains and understand reformulation.' },
-  { label: 'C++', title: 'Integrate SHOT', href: '/docs/dev/cpp.html', text: 'Embed the solver and use callbacks in your application.' },
-  { label: 'Reference', title: 'Find a solver setting', href: '/docs/dev/reference/settings.html', text: 'Look up settings, allowed values and build-specific defaults.' },
+  { label: 'Python', title: 'Build your first model', href: `${docs}/getting-started.html`, text: 'Define variables, constraints and an objective with SHOTpy.' },
+  { label: 'Tutorial', title: 'Work through the notebooks', href: `${docs}/SHOTpy_Tutorial.html`, text: 'Four SHOTpy notebooks, from your first model to callbacks and advanced modeling.' },
+  { label: 'Command line', title: 'Solve a problem file', href: `${docs}/CommandLineUsage.html`, text: 'Run SHOT, choose options and write result files.' },
+  { label: 'Results', title: 'Understand solver output', href: `${docs}/UnderstandingOutput.html`, text: 'Decode solve stages, iteration rows, bounds, gaps and final statuses.' },
+  { label: 'Configuration', title: 'Configure a solve', href: `${docs}/Configuration.html`, text: 'Choose subsolvers, understand settings precedence and set limits and tolerances.' },
+  { label: 'Modeling', title: 'Prepare a model', href: `${docs}/Modeling.html`, text: 'Set useful bounds, respect expression domains and understand reformulation.' },
+  { label: 'C++', title: 'Integrate SHOT', href: `${docs}/cpp.html`, text: 'Embed the solver and use callbacks in your application.' },
+  { label: 'Reference', title: 'Find a solver setting', href: `${docs}/reference/settings.html`, text: 'Look up settings, allowed values and build-specific defaults.' },
 ];
 ---
 <Base title="Documentation" description="SHOT user guides and Python and C++ API references.">
@@ -19,7 +21,7 @@ const guides = [
       <Fragment slot="lead">From your first model to the solver API.</Fragment>
     </Heading>
     <p class="body docs-intro">Installation, worked examples and reference material for SHOT and SHOTpy. The guides cover SHOT 2.0.</p>
-    <a class="shot-btn shot-btn--accent" href="/docs/dev/">Read the documentation</a>
+    <a class="shot-btn shot-btn--accent" href={`${docs}/`}>Read the documentation</a>
     <section class="docs-guides" aria-label="Choose your starting point">
       {guides.map((guide) => (
         <div class="docs-guide">
@@ -31,7 +33,11 @@ const guides = [
     </section>
     <section class="shot-note">
       <p class="label shot-eyebrow">API reference</p>
-      <p class="body"><a href="/docs/dev/reference/python.html">SHOTpy</a> and <a href="/docs/dev/reference/cpp.html">C++</a> references are generated alongside the guides.</p>
+      <p class="body"><a href={`${docs}/reference/python.html`}>SHOTpy</a> and <a href={`${docs}/reference/cpp.html`}>C++</a> references are generated alongside the guides.</p>
+    </section>
+    <section class="shot-note">
+      <p class="label shot-eyebrow">Development version</p>
+      <p class="body">The <a href="/docs/dev/">development documentation</a> follows the master branch and may describe changes that are not released yet.</p>
     </section>
   </main>
 </Base>

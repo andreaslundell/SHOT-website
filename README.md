@@ -56,9 +56,10 @@ The old GitBook URLs under `/shot/` (linked from the SHOT repository, PyPI and t
 
 ## Documentation
 
-The `/docs/` page links to Sphinx documentation built from `coin-or/SHOT` under
-`/docs/dev/`. The deployment workflow builds SHOTpy from the same checkout used for
-the guides and API references. Merge the documentation tooling into SHOT before
+The `/docs/` page links to Sphinx documentation built from `coin-or/SHOT`: the
+released version under `/docs/2.0/`, from tag `v2.0.0` with the SHOTpy 2.0.0 wheel,
+and the development version under `/docs/dev/`, for which the deployment workflow
+builds SHOTpy from the same checkout used for the guides and API references. Merge the documentation tooling into SHOT before
 publishing this workflow. Development builds use HiGHS and Ipopt; backend-dependent
 defaults can differ from other installations.
 
@@ -67,4 +68,6 @@ For a local combined preview, build Astro first, then run the SHOT checkout's
 matching SHOTpy environment. Serve `dist/` with a static HTTP server.
 
 Release documentation must use a fixed tag and be included in each deployment;
-GitHub Pages replaces the whole site. Add released versions to `src/pages/docs/index.astro`.
+GitHub Pages replaces the whole site. For a new release, add its build to
+`.github/workflows/deploy.yml` and point `docs` in `src/pages/docs/index.astro` and
+`src/pages/getting-started.astro`, the footer and the news item to it.

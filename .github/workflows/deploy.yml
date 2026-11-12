@@ -57,6 +57,22 @@ jobs:
         run: python -m pip install --verbose ./shot-source --config-settings=cmake.define.HAS_CBC=off
       - name: Build development documentation
         run: python shot-source/docs/build.py --source-ref "$(git -C shot-source rev-parse HEAD)" --output dist/docs/dev
+      # Released documentation comes from a fixed tag and the SHOTpy wheel built from it, in an environment of
+      # its own so that it does not replace the development SHOTpy. Pages replaces the whole site, so every
+      # retained version is built on each deployment.
+      - uses: actions/checkout@v4
+        with:
+          repository: coin-or/SHOT
+          ref: v2.0.0
+          path: shot-2.0
+      - name: Install SHOTpy 2.0
+        run: |
+          python -m venv .venv-2.0
+          .venv-2.0/bin/python -m pip install SHOTpy==2.0.0 -r shot-2.0/docs/requirements.txt
+      - name: Build 2.0 documentation
+        env:
+          SHOT_DOCS_VERSION: '2.0'
+        run: .venv-2.0/bin/python shot-2.0/docs/build.py --source-ref v2.0.0 --output dist/docs/2.0
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
